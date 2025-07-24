@@ -1,0 +1,50 @@
+name: Provision Environment
+run-name: Provision ${{ inputs.environment }}
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to provision'
+        required: true
+        default: 'e2e'
+        type: choice
+        options:
+          - e2e
+          - staging
+          - production  
+          - development
+          - qa
+      tags:
+        description: 'Tags to apply to the provisioned resources'
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - updates
+          - users
+          - application
+          - tools
+          - fail2ban
+          - data-partition
+          - ufw
+          - decrypt-on-boot
+      
+jobs:
+  provision:
+    runs-on: [self-hosted]
+    steps:
+      - name: Collect ssh key from secrets
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+      
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook infrastructure/infrastructure/server-setup/playbook-k8s.yml \
+          -i infrastructure/infrastructure/server-setup/inventory/e2e-test.yml \
+          --private-key /tmp/id_rsa \
+          --extra-vars="ansible_user=provision"
