@@ -43,7 +43,7 @@
       tags:
         - tools
 
-# this task may be relevant for us. But Now I am ignoring it, Beacause I didn't initialized some of variables.
+    # this task may be relevant for us. But Now I am ignoring it, Beacause I didn't initialized some of variables.
     # - include_tasks:
     #     file: tasks/data-partition.yml
     #     apply:
@@ -71,7 +71,7 @@
       shell: ' cd / && wget -qO - --header="X-Papertrail-Token: {{ papertrail_token }}" \ https://papertrailapp.com/destinations/16712142/setup.sh | sudo bash >> /var/log/papertrail.log 2>&1'
       when: papertrail_token is defined
 
-# we will need this later, For now I am ignoring it.
+    # we will need this later, For now I am ignoring it.
     # - include_tasks:
     #     file: tasks/decrypt-on-boot.yml
     #     apply:
@@ -79,7 +79,5 @@
     #         - decrypt-on-boot
     #   tags:
     #     - decrypt-on-boot
-
-
 
 - import_playbook: k8s.yml
