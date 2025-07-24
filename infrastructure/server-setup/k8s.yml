@@ -1,0 +1,39 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: all
+  gather_facts: yes
+  vars:
+    kubernetes_version: "v1.33"
+    pod_network_cidr: "192.168.0.0/16"
+    calico_version: "v3.26.1"
+    
+  tasks:
+    - name: Include system preparation tasks
+      include_tasks: tasks/system-preparation.yml
+      
+    - name: Include containerd installation tasks
+      include_tasks: tasks/install-containerd.yml
+      
+    - name: Include Kubernetes installation tasks
+      include_tasks: tasks/install-kubernetes.yml
+
+- name: Initialize Kubernetes Master
+  hosts: master
+  vars:
+    kubernetes_version: "v1.33"
+    pod_network_cidr: "192.168.0.0/16"
+    calico_version: "v3.26.1"
+    
+  tasks:
+    - name: Include master initialization tasks
+      include_tasks: tasks/init-master.yml
+      
+    - name: Include network plugin installation tasks
+      include_tasks: tasks/install-network-plugin.yml
+
+- name: Join Worker Nodes
+  hosts: workers
+  
+  tasks:
+    - name: Include worker join tasks
+      include_tasks: tasks/join-workers.yml
