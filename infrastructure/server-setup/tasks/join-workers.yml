@@ -1,0 +1,26 @@
+---
+- name: Check if node is already joined to cluster
+  stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: kubelet_conf_check
+
+- name: Leave the cluster if already joined
+  shell: sudo kubeadm reset -f
+  when: kubelet_conf_check.stat.exists
+
+- name: Read join command from local file
+  local_action:
+    module: slurp
+    src: ./join-command.sh
+  register: join_command_content
+
+- name: Join worker node to cluster
+  shell: "sudo {{ join_command_content.content | b64decode | trim }}"
+  register: join_result
+
+- name: Display join result
+  debug:
+    msg: "{{ join_result.stdout_lines }}"
+
+- name: Enable and start kubelet service
+  shell: sudo systemctl enable kubelet && sudo systemctl start kubelet

@@ -1,0 +1,37 @@
+---
+- name: Install required packages for containerd
+  shell: |
+    sudo apt update
+    sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+
+- name: Remove Docker's old version if it exists
+  shell: sudo apt remove -y docker docker-engine docker.io containerd runc
+
+- name: Remove Docker's official GPG key if it exists
+  shell: sudo rm -f /etc/apt/trusted.gpg.d/docker.gpg
+
+- name: Add Docker's official GPG key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
+
+- name: Add Docker repository
+  shell: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+- name: Install containerd
+  shell: |
+    sudo apt update
+    sudo apt install -y containerd.io
+
+- name: Create containerd configuration directory
+  shell: sudo mkdir -p /etc/containerd
+
+- name: Generate containerd default configuration
+  shell: |
+    containerd config default | sudo tee /etc/containerd/config.toml
+
+- name: Configure containerd to use systemd cgroup driver
+  shell: sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+- name: Restart and enable containerd service
+  shell: |
+    sudo systemctl restart containerd
+    sudo systemctl enable containerd
