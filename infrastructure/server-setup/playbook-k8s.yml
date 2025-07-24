@@ -1,0 +1,85 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+---
+- hosts: all
+  become: yes
+  gather_facts: yes
+  ignore_unreachable: false
+  become_method: sudo
+  tasks:
+    - include_tasks:
+        file: tasks/updates.yml
+        apply:
+          tags:
+            - updates
+
+    - include_tasks:
+        file: tasks/users.yml
+        apply:
+          tags:
+            - users
+      tags:
+        - users
+
+    - include_tasks:
+        file: tasks/application.yml
+        apply:
+          tags:
+            - application
+      tags:
+        - application
+
+    - include_tasks:
+        file: tasks/tools.yml
+        apply:
+          tags:
+            - tools
+      tags:
+        - tools
+
+# this task may be relevant for us. But Now I am ignoring it, Beacause I didn't initialized some of variables.
+    # - include_tasks:
+    #     file: tasks/data-partition.yml
+    #     apply:
+    #       tags:
+    #         - data-partition
+    #   tags:
+    #     - data-partition
+
+
+    - include_tasks:
+        file: tasks/fail2ban.yml
+        apply:
+          tags:
+            - fail2ban
+      tags:
+        - fail2ban
+
+    - name: 'Copy logrotate script'
+      copy:
+        src: ../logrotate.conf
+        dest: /etc/
+
+    - name: 'Save system logs to Papertrail'
+      register: papaertrailSystemLogs
+      shell: ' cd / && wget -qO - --header="X-Papertrail-Token: {{ papertrail_token }}" \ https://papertrailapp.com/destinations/16712142/setup.sh | sudo bash >> /var/log/papertrail.log 2>&1'
+      when: papertrail_token is defined
+
+# we will need this later, For now I am ignoring it.
+    # - include_tasks:
+    #     file: tasks/decrypt-on-boot.yml
+    #     apply:
+    #       tags:
+    #         - decrypt-on-boot
+    #   tags:
+    #     - decrypt-on-boot
+
+
+
+- import_playbook: k8s.yml
