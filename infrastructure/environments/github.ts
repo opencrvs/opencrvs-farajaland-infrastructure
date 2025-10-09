@@ -2,7 +2,7 @@ const sodium = require('libsodium-wrappers')
 import { Octokit } from '@octokit/core'
 import { error } from './logger'
 
-export async function createVariable(
+export async function createEnvironmentVariable(
   octokit: Octokit,
   repositoryId: number,
   environment: string,
@@ -22,7 +22,7 @@ export async function createVariable(
     }
   )
 }
-export async function updateVariable(
+export async function updateEnvironmentVariable(
   octokit: Octokit,
   repositoryId: number,
   environment: string,
@@ -34,6 +34,46 @@ export async function updateVariable(
     {
       repository_id: repositoryId,
       environment_name: environment,
+      name: name,
+      value: value,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    }
+  )
+}
+
+// Create repository variable
+export async function createRepositoryVariable(
+  octokit: Octokit,
+  repositoryId: number,
+  name: string,
+  value: string
+): Promise<void> {
+  await octokit.request(
+    `POST /repositories/${repositoryId}/actions/variables`,
+    {
+      repository_id: repositoryId,
+      name: name,
+      value: value,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    }
+  )
+}
+
+// Update repository variable
+export async function updateRepositoryVariable(
+  octokit: Octokit,
+  repositoryId: number,
+  name: string,
+  value: string
+): Promise<void> {
+  await octokit.request(
+    `PATCH /repositories/${repositoryId}/actions/variables/${name}`,
+    {
+      repository_id: repositoryId,
       name: name,
       value: value,
       headers: {
@@ -249,7 +289,7 @@ export async function listEnvironmentSecrets(
     }
   )
 
-  return response.data.secrets.map((secret) => ({
+  return response.data.secrets.map((secret: any) => ({
     ...secret,
     type: 'SECRET',
     scope: 'ENVIRONMENT'
@@ -294,10 +334,31 @@ export async function listEnvironmentVariables(
   )
 
   return response.data.variables
-    .map((variable) => ({
+    .map((variable: any) => ({
       ...variable,
       type: 'VARIABLE' as const,
       scope: 'ENVIRONMENT' as const
     }))
-    .filter((variable) => variable.name !== 'ACTIONS_RUNNER_DEBUG')
+    .filter((variable: { name: string }) => variable.name !== 'ACTIONS_RUNNER_DEBUG')
+}
+
+
+export async function listRepositoryVariables(
+  octokit: Octokit,
+  owner: string,
+  repositoryName: string
+): Promise<Variable[]> {
+  const response = await octokit.request(
+    'GET /repos/{owner}/{repo}/actions/variables',
+    {
+      owner: owner,
+      repo: repositoryName,
+      per_page: 100
+    }
+  )
+  return response.data.variables.map((variable) => ({
+    ...variable,
+    type: 'VARIABLE',
+    scope: 'REPOSITORY'
+  }))
 }

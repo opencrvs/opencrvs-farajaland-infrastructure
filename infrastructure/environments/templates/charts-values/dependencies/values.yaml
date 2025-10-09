@@ -1,5 +1,7 @@
 storage_type: host_path
 
+environment_type: {{environment_type}}
+
 ingress:
   tls_resolver: letsencrypt
 

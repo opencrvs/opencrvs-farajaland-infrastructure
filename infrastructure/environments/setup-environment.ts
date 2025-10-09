@@ -8,17 +8,21 @@ import {
   createEnvironment,
   createEnvironmentSecret,
   createRepositorySecret,
-  createVariable,
+  createRepositoryVariable,
+  createEnvironmentVariable,
   getRepositoryId,
   listEnvironmentSecrets,
   listEnvironmentVariables,
   listRepositorySecrets,
-  updateVariable
+  listRepositoryVariables,
+  updateEnvironmentVariable,
+  updateRepositoryVariable
 } from './github'
 
 import { readFileSync, writeFileSync } from 'fs'
 import { error, info, log, success, warn } from './logger'
 import { generateInventory, copyChartsValues } from './templates'
+import { updateWorkflowEnvironments } from './update-workflows';
 
 const notEmpty = (value: string | number) =>
   value.toString().trim().length > 0 ? true : 'Please enter a value'
@@ -242,6 +246,17 @@ const githubQuestions = [
     validate: notEmpty,
     initial: process.env.GITHUB_REPOSITORY,
     scope: 'REPOSITORY' as const
+  },
+]
+const githubOtherQuestions = [
+  {
+    name: 'githubApprovers',
+    type: 'text' as const,
+    message: 'Please provide/update list of production approvers?',
+    initial: process.env.GH_APPROVERS,
+    valueType: 'VARIABLE' as const,
+    valueLabel: 'GH_APPROVERS',
+    scope: 'REPOSITORY' as const
   }
 ]
 const githubTokenQuestion = [
@@ -307,7 +322,7 @@ const countryQuestions = [
     type: 'text' as const,
     message:
       'What is the ISO 3166-1 alpha-3 country-code? (e.g. "NZL" for New Zealand) Reference: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3',
-    valueType: 'VARIABLE' as const,
+    valueType: 'SECRET' as const,
     valueLabel: 'COUNTRY',
     initial: process.env.COUNTRY,
     scope: 'REPOSITORY' as const
@@ -534,18 +549,6 @@ const emailQuestions = [
   }
 ]
 
-// const vpnHostQuestions = [
-//   {
-//     name: 'vpnAdminPassword',
-//     type: 'text' as const,
-//     message: `Admin password for Wireguard UI`,
-//     initial: generateLongPassword(),
-//     valueType: 'SECRET' as const,
-//     valueLabel: 'VPN_ADMIN_PASSWORD',
-//     scope: 'ENVIRONMENT' as const
-//   }
-// ]
-
 const sentryQuestions = [
   {
     name: 'sentryDsn',
@@ -719,6 +722,7 @@ const metabaseAdminQuestions = [
 
 ALL_QUESTIONS.push(
   ...githubTokenQuestion,
+  ...githubOtherQuestions,
   ...dockerhubQuestions,
   ...infrastructureQuestions,
   ...countryQuestions,
@@ -726,8 +730,6 @@ ALL_QUESTIONS.push(
   ...notificationTransportQuestions,
   ...smsQuestions,
   ...emailQuestions,
-  // TODO: remove vpn questions
-  // ...vpnHostQuestions,
   ...sentryQuestions,
   ...derivedVariables,
   ...metabaseAdminQuestions
@@ -743,15 +745,8 @@ ALL_QUESTIONS.push(
         scope: 'ENVIRONMENT' as const,
         message: 'Purpose for the environment?',
         choices: [
-          { title: 'Development/Quality assurance/Testing (no PII data)', value: 'non-prod' },
-          {
-            title: 'Staging (hosts PII data, no backups)',
-            value: 'production'
-          },
-          {
-            title: 'Production (hosts PII data, requires frequent backups)',
-            value: 'production'
-          },
+          { title: 'Development/Quality assurance/Testing (no PII data)', value: 'non-production' },
+          { title: 'Staging/Production (hosts PII data, requires frequent backups)', value: 'production' },
         ]
       }
     ].map(questionToPrompt)
@@ -814,7 +809,12 @@ ALL_QUESTIONS.push(
     githubRepository
   )
 
-  const existingRepositoryVariable = await listRepositorySecrets(
+  const existingRepositorySecrets = await listRepositorySecrets(
+    octokit,
+    githubOrganisation,
+    githubRepository
+  )
+  const existingRepositoryVariables = await listRepositoryVariables(
     octokit,
     githubOrganisation,
     githubRepository
@@ -834,7 +834,8 @@ ALL_QUESTIONS.push(
 
   const existingValues = [
     ...existingEnvironmentVariables,
-    ...existingRepositoryVariable,
+    ...existingRepositoryVariables,
+    ...existingRepositorySecrets,
     ...existingEnvironmentSecrets
   ]
 
@@ -855,11 +856,15 @@ ALL_QUESTIONS.push(
   } else {
     log(kleur.green('\nSuccessfully logged in to Github\n'))
   }
+  if (environment_type === 'production') {
+    log('\n', kleur.yellow().bold(
+      'WARNING! You are setting up a production environment.\n Make sure you have read the deployment guide carefully before proceeding.\n'
+    ))
+    await promptAndStoreAnswer(environment, githubOtherQuestions, existingValues)
+  }
 
   log('\n', kleur.bold().underline('Docker Hub'))
-
   await promptAndStoreAnswer(environment, dockerhubQuestions, existingValues)
-
     
   log('\n', kleur.bold().underline('Kubernetes & Runtime'))
 
@@ -873,8 +878,10 @@ ALL_QUESTIONS.push(
     ? infrastructure.workerNodes.split(',').map((ip: string) => ip.trim())
     : []
   const backupHost = infrastructure.backupHost || ''
+  log('\n', kleur.bold().underline('Running configuration files updates'))
   generateInventory(environment, {worker_nodes: workerNodes, backup_host: backupHost, kube_api_host: infrastructure.kubeAPIHost})
-  copyChartsValues(environment, { env: environment})
+  copyChartsValues(environment, { env: environment, environment_type: environment_type })
+  await updateWorkflowEnvironments();
 
   log('\n', kleur.bold().underline('Databases & monitoring'))
   await promptAndStoreAnswer(
@@ -1500,28 +1507,45 @@ ALL_QUESTIONS.push(
 
   for (const newVariable of newVariables) {
     log(`Creating variable ${newVariable.name} with value ${newVariable.value}`)
+    if (newVariable.scope === 'ENVIRONMENT') {
+      await createEnvironmentVariable(
+        octokit,
+        repositoryId,
+        environment,
+        newVariable.name,
+        newVariable.value
+      )
+    } else {
+      await createRepositoryVariable(
+        octokit,
+        repositoryId,
+        newVariable.name,
+        newVariable.value
+      )
+    }
 
-    await createVariable(
-      octokit,
-      repositoryId,
-      environment,
-      newVariable.name,
-      newVariable.value
-    )
   }
 
   for (const updatedVariable of updatedVariables) {
     log(
       `Updating variable ${updatedVariable.name} with value ${updatedVariable.value}`
     )
-
-    await updateVariable(
-      octokit,
-      repositoryId,
-      environment,
-      updatedVariable.name,
-      updatedVariable.value
-    )
+    if (updatedVariable.scope === 'ENVIRONMENT') {
+      await updateEnvironmentVariable(
+        octokit,
+        repositoryId,
+        environment,
+        updatedVariable.name,
+        updatedVariable.value
+      )
+    } else {
+      await updateRepositoryVariable(
+        octokit,
+        repositoryId,
+        updatedVariable.name,
+        updatedVariable.value
+      )
+    }
   }
 
   log(
@@ -1537,7 +1561,7 @@ ALL_QUESTIONS.push(
 -----------------------
 ➡️ ${kleur.bold().yellow('Run following command on Kubernetes worker VM to create provision user and setup SSH key:')}
 
-curl -sfL https://raw.githubusercontent.com/opencrvs/infrastructure/refs/heads/ocrvs-9792/scripts/bootstrap/opencrvs-bootstrap.sh -o opencrvs-bootstrap.sh && \\
+curl -sfL https://raw.githubusercontent.com/opencrvs/infrastructure/refs/heads/develop/scripts/bootstrap/opencrvs-bootstrap.sh -o opencrvs-bootstrap.sh && \\
 bash opencrvs-bootstrap.sh --ssh-public-key ${kleur.bold('[PUT PROVISION USER PUBLIC KEY FROM MASTER NODE]')}` : ''
 
   log(`
@@ -1546,7 +1570,7 @@ Follow the steps below to complete the setup of your environment:
 ${kleur.yellow('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')}
 ➡️ ${kleur.bold().yellow('Run following command on Kubernetes master VM to bootstrap self-hosted runner:')}
 
-curl -sfL https://raw.githubusercontent.com/opencrvs/infrastructure/refs/heads/ocrvs-9792/scripts/bootstrap/opencrvs-bootstrap.sh -o opencrvs-bootstrap.sh && \\
+curl -sfL https://raw.githubusercontent.com/opencrvs/infrastructure/refs/heads/develop/scripts/bootstrap/opencrvs-bootstrap.sh -o opencrvs-bootstrap.sh && \\
 bash opencrvs-bootstrap.sh --owner ${githubOrganisation} \\
             --repo ${githubRepository} \\
             --env ${environment} \\

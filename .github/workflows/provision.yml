@@ -6,7 +6,7 @@ on:
       environment:
         description: 'Infrastructure to provision'
         required: true
-        default: 'demo'
+        default: 'dev'
         type: choice
         options:
           - ""

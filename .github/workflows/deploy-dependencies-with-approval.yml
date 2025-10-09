@@ -11,6 +11,19 @@ on:
         options:
           - ""
 jobs:
+  approve:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ vars.GH_APPROVERS }} # comma separated list of GitHub usernames
+          minimum-approvals: 1
+          issue-title: 'Deploy (${{ github.event.inputs.environment }}): core: ${{ github.event.inputs.core-image-tag }} country config: ${{ github.event.inputs.countryconfig-image-tag }}'
+          issue-body: 'Please approve or deny the deployment of core: ${{ github.event.inputs.core-image-tag }} country config: ${{ github.event.inputs.countryconfig-image-tag }} to ${{ github.event.inputs.environment }}'
+          exclude-workflow-initiator-as-approver: false
   github-to-k8s-sync-env:
     uses: ./.github/workflows/github-to-k8s-sync-env.yml
     with:

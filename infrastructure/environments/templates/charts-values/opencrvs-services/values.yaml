@@ -9,6 +9,8 @@
 ingress:
   tls_resolver: letsencrypt
 
+environment_type: {{environment_type}}
+
 hpa:
   enabled: false
 
