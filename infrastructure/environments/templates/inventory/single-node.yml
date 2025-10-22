@@ -42,3 +42,6 @@ all:
           # Ansible is executed on master node
           ansible_host: localhost
           ansible_connection: local
+          labels:
+            # traefik-role label is used to identify where to deploy traefik
+            traefik-role: ingress
