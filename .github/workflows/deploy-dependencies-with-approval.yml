@@ -25,13 +25,14 @@ jobs:
           issue-body: 'Please approve or deny the deployment of core: ${{ github.event.inputs.core-image-tag }} country config: ${{ github.event.inputs.countryconfig-image-tag }} to ${{ github.event.inputs.environment }}'
           exclude-workflow-initiator-as-approver: false
   github-to-k8s-sync-env:
+    needs: approve
     uses: ./.github/workflows/github-to-k8s-sync-env.yml
     with:
       environment: ${{ inputs.environment }}
       mapping_file: "deps"
     secrets: inherit
   deploy:
-    needs: github-to-k8s-sync-env
+    needs: [github-to-k8s-sync-env, approve]
     environment: ${{ inputs.environment }}
     env:
       ENV: ${{ inputs.environment }}
