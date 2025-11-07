@@ -1,0 +1,56 @@
+########################################################################################
+# Initial configuration file for OpenCRVS installation
+########################################################################################
+# Some properties are not defined in this file and should be provided as key/value at
+# installation time:
+# - hostname: valid DNS name for opencrvs
+# - countryconfig.image.name: Countryconfig image repository
+# - countryconfig.image.tag: Countryconfig image tag
+ingress:
+  tls_resolver: letsencrypt
+
+environment_type: production
+
+hpa:
+  enabled: false
+
+env:
+  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-staging.svc.cluster.local:8200"
+
+influxdb:
+  host: influxdb-0.influxdb.opencrvs-deps-staging.svc.cluster.local
+elasticsearch:
+  auth_mode: auto
+  host: elasticsearch.opencrvs-deps-staging.svc.cluster.local
+
+
+minio:
+  auth_mode: use_secret
+  host: minio-0.minio.opencrvs-deps-staging.svc.cluster.local
+  external_hostname: minio.test-k8s.opencrvs.dev
+
+mongodb:
+  auth_mode: auto
+  host: mongodb-0.mongodb.opencrvs-deps-staging.svc.cluster.local
+
+redis:
+  auth_mode: acl
+  host: redis-0.redis.opencrvs-deps-staging.svc.cluster.local
+
+postgres:
+  auth_mode: auto
+  host: postgres-0.postgres.opencrvs-deps-staging.svc.cluster.local
+
+imagePullSecrets:
+  # Default value for credentials created while yarn environment:init
+  - name: dockerhub-credentials
+
+countryconfig:
+  smtp-config:
+    - ALERT_EMAIL
+    - SENDER_EMAIL_ADDRESS
+    - SMTP_HOST
+    - SMTP_PASSWORD
+    - SMTP_PORT
+    - SMTP_SECURE
+    - SMTP_USERNAME

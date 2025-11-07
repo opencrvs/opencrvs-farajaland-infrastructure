@@ -9,7 +9,9 @@ on:
         default: 'dev'
         type: choice
         options:
-          - ""
+          - staging
+          - production
+          - demo1
       tags:
         description: 'Tags to apply to the provisioned resources'
         required: true

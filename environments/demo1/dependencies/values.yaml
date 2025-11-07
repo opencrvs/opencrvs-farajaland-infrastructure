@@ -1,0 +1,25 @@
+storage_type: host_path
+
+environment_type: non-production
+
+ingress:
+  tls_resolver: letsencrypt
+
+minio:
+  use_default_credentials: false
+
+elasticsearch:
+  use_default_credentials: false
+
+mongodb:
+  use_default_credentials: false
+
+postgres:
+  use_default_credentials: false
+
+monitoring:
+  enabled: true
+
+elastalert:
+  env:
+    HTTP_POST2_ALERT_URL: http://countryconfig.opencrvs-demo2.svc.cluster.local:3040

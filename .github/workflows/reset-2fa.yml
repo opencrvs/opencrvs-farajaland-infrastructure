@@ -13,7 +13,9 @@ on:
         default: 
         required: true
         options:
-          - ""
+          - staging
+          - production
+          - demo1
 
 jobs:
   approve:

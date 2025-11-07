@@ -25,7 +25,9 @@ on:
         default: "dev"
         type: choice
         options:
-          - ""
+          - demo1
+          - production
+          - staging
 
 jobs:
   approve:
