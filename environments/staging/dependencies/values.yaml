@@ -23,3 +23,16 @@ monitoring:
 elastalert:
   env:
     HTTP_POST2_ALERT_URL: http://countryconfig.opencrvs-staging.svc.cluster.local:3040
+
+# Restore configuration
+restore:
+  enabled: true
+  # Schedule job
+  schedule: "0 0 * * *"
+  # Secret to store backup server connection configuration:
+  # - user, backup server username
+  # - host, hostname / IP of backup server
+  # - ssh_key, ssh key for passwordless connection
+  backup_server_secret: backup-server-ssh-credentials
+  backup_server_dir: /home/backup/production
+  backup_encryption_secret: restore-encryption-secret
