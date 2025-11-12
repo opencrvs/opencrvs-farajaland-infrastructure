@@ -31,7 +31,12 @@ all:
     # Allowed states:
     # - present, user is allowed to login
     # - absent, account is disabled
-    users: []
+    users:
+      - name: vmudryi
+        state: present
+        role: admin
+        ssh_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINgMcsSBwTE0EbMDRSF1T4vJDcN/5HAjKGbi2DqV7g/Q vmudryi@opencrvs.org
 
   children:
     master:
