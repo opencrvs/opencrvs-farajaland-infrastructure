@@ -5,7 +5,7 @@ all:
     # - If your server is exposed (not recommeded), use public IP address
     # - If you would like to run kubectl commands from the remote server, leave this field empty
     # kube_api_host: ''
-    kube_api_host: test-stg.opencrvs.dev
+    kube_api_host: tmp-stg.opencrvs.dev
     # Default ansible provision user, keep as is
     ansible_user: provision
 
