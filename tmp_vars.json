@@ -1,0 +1,16 @@
+{
+    "encrypted_disk_size": "",
+    "disk_encryption_key": "",
+    "k8s_runner_token": "***",
+    "repository": "opencrvs/infrastructure",
+    "k8s_cluster_env": "production",
+    "docker_username": "***",
+    "docker_password": "***",
+    "smtp_host": "***",
+    "smtp_port": "***",
+    "smtp_user": "***",
+    "smtp_secure": "***",
+    "smtp_from": "team@opencrvs.org",
+    "smtp_password": "***",
+    "alert_email": "***"
+  }
