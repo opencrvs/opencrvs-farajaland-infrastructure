@@ -1,0 +1,9 @@
+#!/bin/sh
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+pattern='^[a-z][a-z0-9\-]{1,39}$'
+
+if [[ ! "$branch" =~ $pattern ]]; then
+  echo "❌ Invalid branch name: '$branch'"
+  exit 1
+fi
