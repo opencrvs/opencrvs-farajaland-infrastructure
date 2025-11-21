@@ -27,7 +27,6 @@ elasticsearch:
 minio:
   auth_mode: use_secret
   host: minio-0.minio.opencrvs-deps-production.svc.cluster.local
-  external_hostname: minio.test-k8s.opencrvs.dev
 
 mongodb:
   auth_mode: auto
