@@ -25,3 +25,12 @@ backup_server_user_home: '/home/backup'
 
 # Disk Encryption key location as an example (in production use a hardware security module)
 disk_encryption_key_path: /root/disk-encryption-key.txt
+
+# Helm version
+helm_version: "v3.19.2"
+
+# Certificate manager chart version
+cert_manager_version: "v1.18.2"
+
+# Action runner controller chart version
+arc_chart_version: "0.23.7"

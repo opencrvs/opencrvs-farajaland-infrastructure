@@ -87,11 +87,15 @@
 
 - name: Delete kube-apiserver pods to restart with new certs
   when: sans_update_needed
+  retries: 5
+  delay: 30
   ansible.builtin.command: kubectl -n kube-system delete pod -l component=kube-apiserver --timeout=30s
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
 
 - name: Check api-server status
+  retries: 5
+  delay: 30
   shell: |
     kubectl wait --for=condition=ready pod -l component=kube-apiserver -n kube-system --timeout=30s
   register: kubectl_result

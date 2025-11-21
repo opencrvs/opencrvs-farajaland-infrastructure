@@ -65,5 +65,6 @@ jobs:
             --namespace "opencrvs-deps-${ENV}" \
             -f environments/${ENV}/dependencies/values.yaml \
             --create-namespace \
+            --timeout 15m \
             --set hostname=${{ vars.DOMAIN }} \
             --atomic
