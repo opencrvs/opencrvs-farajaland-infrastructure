@@ -235,6 +235,24 @@ export async function createRepositorySecret(
   )
 }
 
+export async function getRepositoryEnvironments(
+  octokit: Octokit,
+  githubOrganisation: string,
+  repository: string
+): Promise<string[]> {
+
+  const response = await octokit.request('GET /repos/{githubOrganisation}/{repository}/environments', {
+    githubOrganisation,
+    repository,
+  });
+
+  // Safe access with fallback to empty array if undefined
+  const environments = (response.data.environments ?? []).map(
+    (env: { name: string }) => env.name
+  );
+  return environments;
+}
+
 export async function createEnvironment(
   octokit: Octokit,
   environment: string,

@@ -11,10 +11,6 @@ ansible_python_interpreter: /usr/bin/python3
 crontab_user: root
 provisioning_user: provision
 
-# Kubernetes secret in opencrvs-deps-<env name> namespace
-backup_server_ssh_credentials_secret: "backup-server-ssh-credentials"
-# Path on backup server where to private key is stored
-backup_ssh_key_path: /home/backup/.ssh/id_ed25519
 # User for ssh connection to backup server
 backup_server_user: 'backup'
 # Home directory for user on backup server

@@ -61,7 +61,7 @@
             - kubernetes-installation
       tags:
           - kubernetes-installation
-- name: Initialize Kubernetes Master
+- name: Kubernetes Master
   hosts: master
   tags: k8s
   tasks:
@@ -72,7 +72,7 @@
     - name: Upgrade cluster
       include_tasks: tasks/k8s/upgrade-k8s-master.yml
 
-- name: Join Worker Nodes
+- name: Kubernetes Worker Nodes
   hosts: workers
   tags:
     - join-workers
@@ -94,8 +94,6 @@
       include_tasks: tasks/k8s/metrics-server.yml
     - name: Install k8s self-hosted runner
       include_tasks: tasks/k8s/self-hosted-runner.yml
-    - name: Create backup server secret
-      include_tasks: tasks/k8s/backup-secret.yml
 
 - name: Additional configuration
   become: yes
