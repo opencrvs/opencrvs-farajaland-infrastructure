@@ -140,7 +140,7 @@ jobs:
           openssl enc -aes-256-cbc -pbkdf2 -d -salt -k "${{ secrets.GH_ENCRYPTION_PASSWORD }}" | base64 | tr -d ' \n')
           echo "::add-mask::$BACKUP_HOST_PRIVATE_KEY"
 
-          BACKUP_SERVER_USER=$(echo "${{ needs.get-restore-ssh-user.outputs.secret_value }}" | base64 --decode | \
+          BACKUP_SERVER_USER=$(echo -n "${{ needs.get-restore-ssh-user.outputs.secret_value }}" | base64 --decode | \
           openssl enc -aes-256-cbc -pbkdf2 -d -salt -k "${{ secrets.GH_ENCRYPTION_PASSWORD }}" | base64)
           echo "::add-mask::$BACKUP_SERVER_USER"
 
