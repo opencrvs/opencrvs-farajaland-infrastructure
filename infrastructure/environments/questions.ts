@@ -227,6 +227,17 @@ export const backupQuestions = [
     initial: process.env.BACKUP_SERVER_USER || 'backup',
     scope: 'ENVIRONMENT' as const,
   },
+  {
+    name: 'backupUserHome',
+    type: 'text' as const,
+    message:
+      `Please enter backup server user home directory:`,
+    valueType: 'VARIABLE' as const,
+    validate: notEmpty,
+    valueLabel: 'BACKUP_SERVER_USER_HOME',
+    initial: process.env.BACKUP_SERVER_USER_HOME || '/home/backup',
+    scope: 'ENVIRONMENT' as const,
+  },
 ]
 
 export const diskQuestions = [

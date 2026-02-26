@@ -77,6 +77,9 @@ jobs:
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
           alert_email: ${{ secrets.ALERT_EMAIL }}
           backup_host_public_key: ${{ secrets.BACKUP_HOST_PUBLIC_KEY }}
+          backup_server_user: ${{ secrets.BACKUP_SERVER_USER }}
+          backup_server_user_home: ${{ vars.BACKUP_SERVER_USER_HOME }}
+
       - name: checkout repository
         uses: actions/checkout@v6
       - name: Run Ansible Playbook

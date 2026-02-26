@@ -31,7 +31,7 @@ backup:
   enabled: {{backup_enabled}}
   schedule: "0 1 * * *"
   backup_server_secret: backup-server-ssh-credentials
-  backup_server_dir: /home/backup/{{env}}
+  # backup_server_dir: /home/backup/{{env}}
 
 
 # Restore configuration
@@ -39,5 +39,5 @@ restore:
   enabled: {{restore_enabled}}
   schedule: "0 0 * * *"
   backup_server_secret: backup-server-ssh-credentials
-  backup_server_dir: /home/backup/{{restore_environment_name}}
+  # backup_server_dir: {{backup_server_user_home}}/{{restore_environment_name}}
   backup_encryption_secret: restore-encryption-secret
