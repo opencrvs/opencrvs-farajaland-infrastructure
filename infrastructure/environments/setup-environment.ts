@@ -1303,7 +1303,7 @@ ALL_QUESTIONS.push(
         // FIXME: In general that should be environment_type,
         // Hardcode like this blocks us from being generic:
         // https://github.com/opencrvs/opencrvs-core/issues/11171
-        is_qa_env: environment !== 'production' ? true : false,
+        two_fa_enabled: environment !== 'production' ? true : false,
         backup_enabled: configureBackup ? true : false,
         restore_enabled: restoreEnvironmentName ? true : false,
         restore_environment_name: restoreEnvironmentName || "",
