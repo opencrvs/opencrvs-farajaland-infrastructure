@@ -29,3 +29,9 @@ mosip_api:
       - MOSIP_PACKET_AUTH_CLIENT_SECRET
       - MOSIP_WEBSUB_AUTH_CLIENT_SECRET
       - MOSIP_WEBSUB_SECRET
+
+mosip_mock:
+  enabled: false
+
+esignet_mock:
+  enabled: false
