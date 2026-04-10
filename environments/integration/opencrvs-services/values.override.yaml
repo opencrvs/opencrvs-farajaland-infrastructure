@@ -8,8 +8,8 @@ imagePullSecrets: {}
 countryconfig:
   env:
     OPENID_PROVIDER_CLAIMS: name,family_name,given_name,middle_name,birthdate,address
-    OPENID_PROVIDER_CLIENT_ID: mock-client_id
-    ESIGNET_REDIRECT_URL: https://esignet-mock.farajaland-integration.opencrvs.dev/authorize
+    OPENID_PROVIDER_CLIENT_ID: 8iM8fdsPG5aQy0rvYpOK95BeQ5mKM0UlsPMrTQGsqPs
+    ESIGNET_REDIRECT_URL: https://esignet-mosipid.collab.mosip.net/authorize
     MOSIP_API_USERINFO_URL: https://mosip-api.farajaland-integration.opencrvs.dev/esignet/get-oidp-user-info
     VERIFIABLE_CREDENTIALS_SDJWT_ISSUE_URL: https://issuer-api.issuer.opencrvs.dev/openid4vc/sdjwt/issue
     VERIFIABLE_CREDENTIALS_RAW_JWT_SIGN_URL: https://issuer-api.issuer.opencrvs.dev/raw/jwt/sign
