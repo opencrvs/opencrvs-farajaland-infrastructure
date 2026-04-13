@@ -1,0 +1,75 @@
+name: 09. Farajaland Portals Deploy
+run-name: Farajaland Portals Deploy on ${{ inputs.environment }}
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - integration
+env:
+  APPLICATION_CHART_VERSION: "v2.0.0"
+  RELEASE_NAME: "farajaland-portals"
+jobs:
+  deploy:
+    environment: ${{ inputs.environment }}
+    runs-on:
+      - self-hosted
+      - k8s
+      - ${{ inputs.environment }}
+    env:
+      ENV: ${{ inputs.environment }}
+      GITHUB_ACTOR: ${{ github.actor }}
+      SENDER_EMAIL_ADDRESS: ${{ secrets.SENDER_EMAIL_ADDRESS }}
+      ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install/Upgrade Helm release
+        id: deploy
+        run: |
+          stern -n "${RELEASE_NAME}-${ENV}" \
+            --since 1s \
+            --tail 0 \
+            --exclude 'kube-probe' \
+            --exclude '"level":(30|info)' \
+            --template '{{.PodName}}/{{.ContainerName}} | {{.Message}}{{"\n"}}' \
+            . &
+          STERN_PID=$!
+
+          helm upgrade --install ${RELEASE_NAME} oci://ghcr.io/opencrvs/opencrvs-application:${APPLICATION_CHART_VERSION} \
+            --namespace "${RELEASE_NAME}-${ENV}" \
+            -f environments/${ENV}/${RELEASE_NAME}.yaml \
+            --create-namespace \
+            --timeout 15m \
+            --set hostname=${{ vars.DOMAIN }} \
+            --atomic; STATUS=$?;
+
+          kill $STERN_PID 2>/dev/null || true
+          exit $STATUS
+      - name: Send email
+        if: always()
+        run: |
+          subject="🚀 ${RELEASE_NAME} deployment to '$ENV' completed successfully"
+          if [ "${{ steps.deploy.outcome }}" == 'failure' ]; then
+            subject="⚠️ ${RELEASE_NAME} deployment to '$ENV' has failed"
+          fi
+          EMAIL_PAYLOAD="{
+            \"subject\": \"$subject\",
+            \"html\": \"${subject}<br/>Deployed by GitHub user: @${GITHUB_ACTOR}\",
+            \"from\": \"${SENDER_EMAIL_ADDRESS}\",
+            \"to\": \"${ALERT_EMAIL}\"
+          }"
+
+          curl -X POST http://countryconfig.opencrvs-$ENV.svc.cluster.local:3040/email \
+               -H 'Content-Type: application/json' \
+               -d "$EMAIL_PAYLOAD" \
+               --connect-timeout 5 \
+               --max-time 10 \
+               --fail \
+               --silent \
+               --show-error || echo "Error: Failed to reach countryconfig service"
