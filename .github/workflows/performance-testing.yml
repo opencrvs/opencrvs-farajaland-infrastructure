@@ -1,11 +1,14 @@
 name: 10. Performance testing
-run-name: "Run performance test action ${{ inputs.action }} on ${{ inputs.environment }} "
+run-name: "Run performance test action ${{ inputs.action }} on ${{
+  inputs.environment }} "
 on:
   workflow_call:
     inputs:
       action:
         type: string
       environment:
+        type: string
+      k6_script:
         type: string
   workflow_dispatch:
     inputs:
@@ -24,6 +27,15 @@ on:
         type: choice
         options:
           - prod
+          - integration
+      k6_script:
+        description: "k6 test script to run"
+        required: true
+        default: "smoke"
+        type: choice
+        options:
+          - smoke
+          - load
 
 env:
   # Assuming chart version matches core image tag
@@ -54,6 +66,7 @@ jobs:
             -f environments/${ENV}/${{ inputs.action }}.yaml \
             --timeout 15m \
             --namespace "opencrvs-${ENV}" \
+            --set k6_script=${{ inputs.k6_script }} \
             --set postgres.user=${{ secrets.POSTGRES_USER }} \
             --set postgres.password=${{ secrets.POSTGRES_PASSWORD }} \
             --set postgres.host=postgres-0.postgres.opencrvs-deps-${ENV}.svc.cluster.local \
