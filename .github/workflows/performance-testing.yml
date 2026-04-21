@@ -36,6 +36,7 @@ on:
         options:
           - smoke
           - load
+          - soak
 
 env:
   # Assuming chart version matches core image tag
