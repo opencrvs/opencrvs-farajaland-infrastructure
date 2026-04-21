@@ -57,15 +57,16 @@ jobs:
           stern -n "opencrvs-${ENV}" \
             --since 1s \
             --tail 0 \
-            --exclude 'kube-probe' \
-            --exclude '"level":(30|info)' \
-            --template '{{.PodName}}/{{.ContainerName}} | {{.Message}}{{"\n"}}' \
+            --selector "app.kubernetes.io/instance=${{ inputs.action }}" \
+            --template '{{.Message}}{{"\n"}}' \
             . &
           STERN_PID=$!
+
           touch environments/${ENV}/${{ inputs.action }}.yaml
           helm upgrade --install ${{ inputs.action }} oci://ghcr.io/opencrvs/${{ inputs.action }} \
             -f environments/${ENV}/${{ inputs.action }}.yaml \
-            --timeout 15m \
+            --timeout 5m \
+            --wait \
             --namespace "opencrvs-${ENV}" \
             --set k6_script=${{ inputs.k6_script }} \
             --set postgres.user=${{ secrets.POSTGRES_USER }} \
@@ -74,8 +75,41 @@ jobs:
             --set env.count=${{ vars.GENERATE_DATA_COUNT_RECORDS }} \
             --set env.sleepMs=0 \
             --set env.batchSize=${{ vars.GENERATE_DATA_BATCH_SIZE }}
+
+          JOB_NAME=$(kubectl get jobs -n "opencrvs-${ENV}" \
+            --sort-by=.metadata.creationTimestamp \
+            -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | grep "^${{ inputs.action }}-" | tail -1) || true
+
+          JOB_STATUS=1
+          if [ -n "$JOB_NAME" ]; then
+            echo "Waiting for job $JOB_NAME to complete or fail..."
+            DEADLINE=$(($(date +%s) + 5400))
+            set +e
+            while [ "$(date +%s)" -lt "$DEADLINE" ]; do
+              CONDITIONS=$(kubectl get job "$JOB_NAME" -n "opencrvs-${ENV}" \
+                -o jsonpath='{range .status.conditions[*]}{.type}={.status}{"\n"}{end}' 2>/dev/null)
+              if echo "$CONDITIONS" | grep -q "Complete=True"; then
+                JOB_STATUS=0
+                break
+              elif echo "$CONDITIONS" | grep -q "Failed=True"; then
+                JOB_STATUS=1
+                break
+              fi
+              sleep 15
+            done
+            set -e
+          fi
+
           kill $STERN_PID 2>/dev/null || true
-          exit $STATUS
+
+          if [ -n "$JOB_NAME" ]; then
+            echo "## k6 Test Summary" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            kubectl logs -n "opencrvs-${ENV}" "job/$JOB_NAME" >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          exit $JOB_STATUS
       - name: Cleanup Helm Locks
         if: failure() || cancelled()
         run: |
