@@ -37,6 +37,7 @@ on:
           - smoke
           - load
           - soak
+          - spike
 
 env:
   # Assuming chart version matches core image tag
