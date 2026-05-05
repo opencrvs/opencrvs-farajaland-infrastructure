@@ -52,6 +52,32 @@ jobs:
       - ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v6
+      - name: Start CPU profiling
+        if: inputs.action == 'perf-test'
+        run: |
+          EVENTS_POD=$(kubectl get pods -n "opencrvs-${ENV}" \
+            -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' \
+            | grep '^events-' | head -1)
+          echo "EVENTS_POD=$EVENTS_POD" >> "$GITHUB_ENV"
+          echo "Profiling pod: $EVENTS_POD"
+
+          # Enable Node.js inspector — assumes the server runs as PID 1.
+          # If not, replace 1 with: $(kubectl exec ... -- sh -c 'pgrep -o node')
+          kubectl exec -n "opencrvs-${ENV}" "$EVENTS_POD" -- \
+            node -e "process.kill(1, 'SIGUSR1')"
+          sleep 2
+
+          # Run the profiler inside the pod — connects to 127.0.0.1:9229 directly,
+          # no port-forward needed, no Node.js required on the runner.
+          kubectl cp scripts/capture-profile.js \
+            -n "opencrvs-${ENV}" "${EVENTS_POD}:/tmp/capture-profile.js"
+
+          PROFILER_POD_PID=$(kubectl exec -n "opencrvs-${ENV}" "$EVENTS_POD" -- \
+            sh -c 'PROFILE_OUT=/tmp/profile.cpuprofile \
+                   nohup node /tmp/capture-profile.js >/tmp/profiler.log 2>&1 & echo $!')
+          echo "PROFILER_POD_PID=$PROFILER_POD_PID" >> "$GITHUB_ENV"
+          echo "Profiler running in pod with PID $PROFILER_POD_PID"
+
       - name: Deploy with Helm
         id: deploy
         run: |
@@ -115,6 +141,23 @@ jobs:
           fi
 
           exit $JOB_STATUS
+      - name: Save CPU profile
+        if: always() && inputs.action == 'perf-test'
+        run: |
+          kubectl exec -n "opencrvs-${ENV}" "$EVENTS_POD" -- \
+            sh -c "kill -TERM $PROFILER_POD_PID 2>/dev/null || true"
+          sleep 5
+          kubectl cp -n "opencrvs-${ENV}" \
+            "${EVENTS_POD}:/tmp/profile.cpuprofile" ./profile.cpuprofile || true
+
+      - name: Upload CPU profile
+        if: always() && inputs.action == 'perf-test'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpu-profile-${{ inputs.k6_script }}-${{ inputs.environment }}
+          path: profile.cpuprofile
+          if-no-files-found: warn
+
       - name: Cleanup Helm Locks
         if: failure() || cancelled()
         run: |
