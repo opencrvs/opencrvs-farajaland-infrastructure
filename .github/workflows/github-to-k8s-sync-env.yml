@@ -201,8 +201,6 @@ jobs:
           echo BACKUP_HOST=$BACKUP_HOST >> $env_file
           echo BACKUP_HOST_PRIVATE_KEY=$BACKUP_HOST_PRIVATE_KEY >> $env_file
           echo BACKUP_SERVER_USER=$BACKUP_SERVER_USER >> $env_file
-          echo POSTGRES_USER=$POSTGRES_USER >> $env_file
-          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> $env_file
           grep BACKUP_HOST_PRIVATE_KEY $env_file || echo "No restore encryption passphrase to add"
 
       - name: Preprocess mapping into Secret YAMLs
