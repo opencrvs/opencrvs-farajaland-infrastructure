@@ -106,7 +106,7 @@ jobs:
           if [ -n "$JOB_NAME" ]; then
             FULL_LOG=$(kubectl logs -n "opencrvs-${ENV}" "job/$JOB_NAME" 2>/dev/null || true)
             ERRORS=$(echo "$FULL_LOG" | grep -E "level=(error|warn)" | sort -u | head -20)
-            METRICS=$(echo "$FULL_LOG" | grep -E "✓|✗|checks\.|data_received|data_sent|http_req|iteration|vus" | head -130)
+            METRICS=$(echo "$FULL_LOG" | tail -70)
             echo "## k6 Test Summary" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             { [ -n "$ERRORS" ] && echo "$ERRORS" && echo ""; } >> $GITHUB_STEP_SUMMARY || true
