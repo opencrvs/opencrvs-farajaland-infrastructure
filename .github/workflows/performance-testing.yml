@@ -104,9 +104,13 @@ jobs:
           kill $STERN_PID 2>/dev/null || true
 
           if [ -n "$JOB_NAME" ]; then
+            FULL_LOG=$(kubectl logs -n "opencrvs-${ENV}" "job/$JOB_NAME" 2>/dev/null || true)
+            ERRORS=$(echo "$FULL_LOG" | grep -E "level=(error|warn)" | sort -u | head -20)
+            METRICS=$(echo "$FULL_LOG" | grep -E "✓|✗|checks\.|data_received|data_sent|http_req|iteration|vus" | head -130)
             echo "## k6 Test Summary" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            kubectl logs -n "opencrvs-${ENV}" "job/$JOB_NAME" >> $GITHUB_STEP_SUMMARY || true
+            { [ -n "$ERRORS" ] && echo "$ERRORS" && echo ""; } >> $GITHUB_STEP_SUMMARY || true
+            echo "$METRICS" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           fi
 
