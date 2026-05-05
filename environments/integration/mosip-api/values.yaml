@@ -1,0 +1,37 @@
+ingress:
+  tls_resolver: letsencrypt
+  ssl_enabled: true
+
+mosip_api:
+  env:
+    ESIGNET_TOKEN_URL: "https://esignet-mosipid.collab.mosip.net/v1/esignet/oauth/v2/token"
+    ESIGNET_USERINFO_URL: "https://esignet-mosipid.collab.mosip.net/v1/esignet/oidc/userinfo"
+    IDA_AUTH_DOMAIN_URI: "https://api-internal.collab.mosip.net"
+    IDA_AUTH_URL: "https://api.collab.mosip.net/idauthentication/v1/auth"
+    MOSIP_AUTH_CLIENT_APP_ID: "ida"
+    MOSIP_AUTH_URL: "https://api-internal.collab.mosip.net/v1/authmanager/authenticate/clientidsecretkey"
+    MOSIP_CENTER_ID: "10001"
+    MOSIP_CREATE_PACKET_URL: "https://api-internal.collab.mosip.net/commons/v1/packetmanager/createPacket"
+    MOSIP_MACHINE_ID: "20042"
+    MOSIP_PACKET_AUTH_CLIENT_ID: "mosip-crvs1-client"
+    MOSIP_PROCESS_PACKET_URL: "https://api-internal.collab.mosip.net/registrationprocessor/v1/workflowmanager/workflowinstance"
+    MOSIP_VERIFIABLE_CREDENTIAL_ALLOWLIST: "https://api.collab.mosip.net/.well-known/public-key.json"
+    MOSIP_WEBSUB_AUTH_CLIENT_ID: "crvs_partner"
+    MOSIP_WEBSUB_CALLBACK_URL: "https://mosip-api.opencrvs-integration.opencrvs.dev/websub/callback"
+    MOSIP_WEBSUB_HUB_URL: "https://api-internal.collab.mosip.net/hub"
+    MOSIP_WEBSUB_TOPIC: "crvs_partner/CREDENTIAL_ISSUED"
+    OIDP_CLIENT_PRIVATE_KEY_PATH: "/certs/esignet-jwk.txt"
+    PARTNER_MISP_LK: "opencrvs-auth-partner"
+  secrets:
+    mosip-api-config:
+      - DECRYPT_P12_FILE_PASSWORD
+      - SIGN_P12_FILE_PASSWORD
+      - MOSIP_PACKET_AUTH_CLIENT_SECRET
+      - MOSIP_WEBSUB_AUTH_CLIENT_SECRET
+      - MOSIP_WEBSUB_SECRET
+
+mosip_mock:
+  enabled: false
+
+esignet_mock:
+  enabled: false

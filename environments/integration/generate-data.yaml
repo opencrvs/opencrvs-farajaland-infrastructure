@@ -1,0 +1,11 @@
+postgres:
+  user: events_app
+  password: sgFQzcudhn8bztv5PeUuikPW9a7k8W9Z
+  host: postgres-0.postgres.opencrvs-deps-prod.svc.cluster.local
+env:
+  count: 620000
+  sleepMs: 0
+  batchSize: 500
+
+nodeSelector:
+  role: data2

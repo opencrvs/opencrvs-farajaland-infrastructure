@@ -1,0 +1,26 @@
+##################################################################################
+# Use this file to customize helm chart behavior
+# Please make sure your custom changes doesn't conflict with values.yaml
+##################################################################################
+env:
+  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-demo.svc.cluster.local:8200"
+countryconfig:
+  secrets:
+    reference-data-db-secret:
+      - REFERENCE_DATA_DATABASE_URL
+  env:
+    OPENID_PROVIDER_CLAIMS: name,family_name,given_name,middle_name,birthdate,address
+    OPENID_PROVIDER_CLIENT_ID: mock-client_id
+    ESIGNET_REDIRECT_URL: https://esignet-mock.farajaland-demo-staging.opencrvs.org/authorize
+    MOSIP_API_USERINFO_URL: https://mosip-api.farajaland-demo-staging.opencrvs.org/esignet/get-oidp-user-info
+    VERIFIABLE_CREDENTIALS_SDJWT_ISSUE_URL: https://proxy.issuer.opencrvs.dev/openid4vc/sdjwt/issue
+    VERIFIABLE_CREDENTIALS_RAW_JWT_SIGN_URL: https://proxy.issuer.opencrvs.dev/raw/jwt/sign
+
+
+postgres_on_deploy:
+  secrets:
+    reference-data-db-secret:
+      - REFERENCE_DATA_POSTGRES_USER
+      - REFERENCE_DATA_POSTGRES_PASSWORD
+      - REFERENCE_DATA_EDITOR_USER
+      - REFERENCE_DATA_EDITOR_PASSWORD

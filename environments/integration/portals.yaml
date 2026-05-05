@@ -1,0 +1,16 @@
+app_name: portals
+hostname: portals.farajaland-integration.opencrvs.dev
+ingress:
+  ssl_enabled: true
+  tls_resolver: null 
+imagePullSecrets:
+  - name: portal-docker-reg
+
+service:
+  enabled: true
+  port: 8080
+  container_port: 8080
+
+image:
+  name: ghcr.io/opencrvs/opencrvs-farajaland-demo-portals
+  tag: latest
