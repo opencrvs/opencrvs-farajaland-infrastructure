@@ -67,6 +67,8 @@ jobs:
           NODE_PID=$(kubectl exec -n "opencrvs-${ENV}" "$EVENTS_POD" -- \
             sh -c 'for p in /proc/[0-9]*; do
                      pid=${p##*/}
+                     comm=$(cat "$p/comm" 2>/dev/null)
+                     [ "$comm" = "node" ] || continue
                      cmd=$(tr "\0" " " < "$p/cmdline" 2>/dev/null)
                      case "$cmd" in
                        *"build/dist/src/index.js"*) echo "$pid"; break ;;
