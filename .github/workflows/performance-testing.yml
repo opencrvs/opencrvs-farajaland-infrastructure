@@ -61,10 +61,25 @@ jobs:
           echo "EVENTS_POD=$EVENTS_POD" >> "$GITHUB_ENV"
           echo "Profiling pod: $EVENTS_POD"
 
-          # Enable Node.js inspector — assumes the server runs as PID 1.
-          # If not, replace 1 with: $(kubectl exec ... -- sh -c 'pgrep -o node')
+          # PID 1 is `yarn start:prod` (itself a Node process), which spawns the
+          # real server as a child. Signalling PID 1 would attach the inspector
+          # to yarn — which sits idle — so find the actual server process.
+          NODE_PID=$(kubectl exec -n "opencrvs-${ENV}" "$EVENTS_POD" -- \
+            sh -c 'for p in /proc/[0-9]*; do
+                     pid=${p##*/}
+                     cmd=$(tr "\0" " " < "$p/cmdline" 2>/dev/null)
+                     case "$cmd" in
+                       *"build/dist/src/index.js"*) echo "$pid"; break ;;
+                     esac
+                   done')
+          if [ -z "$NODE_PID" ]; then
+            echo "Could not find events server node process" >&2
+            exit 1
+          fi
+          echo "Events server Node PID: $NODE_PID"
+
           kubectl exec -n "opencrvs-${ENV}" "$EVENTS_POD" -- \
-            node -e "process.kill(1, 'SIGUSR1')"
+            node -e "process.kill($NODE_PID, 'SIGUSR1')"
           sleep 2
 
           # Run the profiler inside the pod — connects to 127.0.0.1:9229 directly,
