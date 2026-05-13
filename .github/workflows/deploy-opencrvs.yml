@@ -32,7 +32,10 @@ on:
         default: "development"
         type: choice
         options:
-          - ""
+          - demo
+          - demo-staging
+          - integration
+          - prod
 
 env:
   # Assuming chart version matches core image tag
