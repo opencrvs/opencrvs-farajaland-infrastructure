@@ -45,8 +45,8 @@
         apiGroup: rbac.authorization.k8s.io
 
 - name: Deploy opencrvs-infra-runner
-  retries: 5
-  delay: 10
+  retries: 10
+  delay: 60
   vars:
     base_labels:
       - "self-hosted"
