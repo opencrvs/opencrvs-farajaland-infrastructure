@@ -1,0 +1,12 @@
+ingress:
+  tls_resolver: letsencrypt
+  ssl_enabled: true
+
+mosip_api:
+  enabled: false
+
+mosip_mock:
+  enabled: false
+
+esignet_mock:
+  enabled: false

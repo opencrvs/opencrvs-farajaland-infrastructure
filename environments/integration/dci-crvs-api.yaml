@@ -1,0 +1,22 @@
+app_name: dci-crvs-api
+hostname: dci-crvs-api.farajaland-integration.opencrvs.dev
+ingress:
+  ssl_enabled: true
+  tls_resolver: null 
+imagePullSecrets:
+  - name: portal-docker-reg
+
+service:
+  enabled: true
+  port: 1660
+  container_port: 1660
+
+env:
+  OPENCRVS_AUTH_URL: http://auth.opencrvs-integration.svc.cluster.local:4040
+  # OPENCRVS_TOKEN_URL: http://auth.opencrvs-farajaland-infrastructure.svc.cluster.local:4040/internal/reindexing-token
+  OPENCRVS_GATEWAY_URL: http://gateway.opencrvs-integration.svc.cluster.local:7070
+  # OPENCRVS_EVENTS_URL: http://events.opencrvs-farajaland-infrastructure.svc.cluster.local:5555
+
+image:
+  name: opencrvs/dci-crvs-api
+  tag: 73333b1

@@ -1,0 +1,19 @@
+##################################################################################
+# Use this file to customize helm chart behavior
+# Please make sure your custom changes doesn't conflict with values.yaml
+##################################################################################
+
+elasticsearch:
+  host_data_path: /data/demo/elasticsearch
+
+minio:
+  host_data_path: /data/demo/minio
+
+mongodb:
+  host_data_path: /data/demo/mongodb
+
+postgres:
+  host_data_path: /data/demo/postgres
+
+influxdb:
+  host_data_path: /data/demo/influxdb

@@ -1,0 +1,15 @@
+k6_env_args:
+  GATEWAY_URL: https://gateway.farajaland-integration.opencrvs.dev
+  EVENTS_URL: https://events.farajaland-integration.opencrvs.dev
+
+k6_output: "output-elasticsearch"
+
+env:
+  K6_ELASTICSEARCH_URL: http://elasticsearch-0.elasticsearch.opencrvs-deps-integration.svc.cluster.local:9200
+  K6_ELASTICSEARCH_USER: elastic
+
+perf_test:
+  secrets:
+    elasticsearch-admin-user:
+      - ELASTIC_PASSWORD:K6_ELASTICSEARCH_PASSWORD
+

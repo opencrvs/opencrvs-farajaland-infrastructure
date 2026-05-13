@@ -1,0 +1,14 @@
+k6_env_args:
+  GATEWAY_URL: https://gateway.tmp-prod.opencrvs.dev
+  EVENTS_URL: https://events.tmp-prod.opencrvs.dev
+
+k6_output: "output-elasticsearch"
+k6_script: load
+env:
+  K6_ELASTICSEARCH_URL: http://elasticsearch-0.elasticsearch.opencrvs-deps-prod.svc.cluster.local:9200
+  K6_ELASTICSEARCH_USER: elastic
+
+perf_test:
+  secrets:
+    elasticsearch-admin-user:
+      - ELASTIC_PASSWORD:K6_ELASTICSEARCH_PASSWORD
