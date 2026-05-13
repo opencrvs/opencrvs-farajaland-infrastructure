@@ -13,7 +13,9 @@ on:
         default: 
         required: true
         options:
-          - ""
+          - prod
+          - integration
+          - demo
 
 jobs:
   approve:

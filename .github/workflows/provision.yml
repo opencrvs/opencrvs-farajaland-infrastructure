@@ -9,7 +9,9 @@ on:
         default: 'dev'
         type: choice
         options:
-          - ""
+          - prod
+          - integration
+          - demo
       tags:
         description: 'Tags to apply to the provisioned resources'
         required: true
@@ -77,6 +79,7 @@ jobs:
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
           alert_email: ${{ secrets.ALERT_EMAIL }}
           backup_host_public_key: ${{ secrets.BACKUP_HOST_PUBLIC_KEY }}
+          self_hosted_runner_additional_labels: ${{ vars.SELF_HOSTED_RUNNER_ADDITIONAL_LABELS }}
       - name: checkout repository
         uses: actions/checkout@v6
       - name: Run Ansible Playbook
