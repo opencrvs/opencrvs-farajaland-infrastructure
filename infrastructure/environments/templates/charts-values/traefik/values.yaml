@@ -99,6 +99,9 @@ tlsStore:
 
 deployment:
   hostNetwork: true
+  {{#if static_ssl}}
+  kind: DaemonSet
+  {{/if}}
   {{#if lets_encrypt}}
   additionalVolumes:
     - name: acme
@@ -106,6 +109,8 @@ deployment:
         path: /data/traefik
   {{/if}}
 
-
+# If you need to run traefik on all cluster nodes
+# Add this line to traefik/values.override.yaml
+# nodeSelector: {}
 nodeSelector:
   traefik-role: ingress

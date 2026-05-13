@@ -64,6 +64,7 @@ jobs:
               --version ${{ steps.helm-version.outputs.version }} \
               --values ${namespace}.json \
               --namespace ${namespace} \
+              --set elasticsearch.reindex_enabled=true \
               --show-only templates/elasticsearch-reindex-job.yaml \
               oci://ghcr.io/opencrvs/opencrvs-services \
               | kubectl apply --wait -n ${namespace} -f -
@@ -76,7 +77,7 @@ jobs:
             touch /tmp/logs_stramed-${namespace}-elasticsearch-reindex.txt  || break;
             sleep 10; done &
           echo "---------------------- Waiting for job completion ----------------------"
-          kubectl wait --for=condition=complete job/elasticsearch-reindex -n ${namespace} --timeout=600s; status=$? || true
+          kubectl wait --for=condition=complete job/elasticsearch-reindex -n ${namespace} --timeout=3600s; status=$? || true
           [ $status -ne 0 ] && kubectl get pods -n ${namespace} --show-labels && kubectl describe pod -ljob-name=${job_name} -n ${namespace};
           [ ! -f /tmp/logs_stramed-${namespace}-elasticsearch-reindex.txt ] && kubectl logs job/elasticsearch-reindex --all-containers -n ${namespace} || \
             rm -vf /tmp/logs_stramed-${namespace}-elasticsearch-reindex.txt

@@ -85,10 +85,10 @@ check_ubuntu_version
 check_internet
 
 echo "Downloading dependencies..."
-
+sudo rm -f /tmp/create-provision-user.sh
 curl -sS https://raw.githubusercontent.com/opencrvs/infrastructure/develop/scripts/bootstrap/create-provision-user.sh -o /tmp/create-provision-user.sh
 chmod +x /tmp/create-provision-user.sh
-
+sudo rm -f /tmp/node-runner.sh
 curl -sS https://raw.githubusercontent.com/opencrvs/infrastructure/develop/scripts/bootstrap/node-runner.sh -o /tmp/node-runner.sh
 chmod +x /tmp/node-runner.sh
 

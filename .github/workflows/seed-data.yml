@@ -80,7 +80,7 @@ jobs:
             echo "values-file=/tmp/${namespace}.json" >> $GITHUB_OUTPUT
 
       - name: Upload helm release values file /tmp/opencrvs-${{ inputs.environment }}.json
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: opencrvs-${{ inputs.environment }}-values-file
           path: /tmp/opencrvs-${{ inputs.environment }}.json
@@ -101,10 +101,9 @@ jobs:
       matrix:
         job-name:
           - data-seed
-          - elasticsearch-reindex
     steps:
         - name: Download helm release values file into /tmp/opencrvs-${{ inputs.environment }}.json
-          uses: actions/download-artifact@v5
+          uses: actions/download-artifact@v8
           with:
             name: opencrvs-${{ inputs.environment }}-values-file
             path: /tmp

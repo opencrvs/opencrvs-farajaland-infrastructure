@@ -10,6 +10,9 @@ on:
         type: choice
         options:
           - ""
+env:
+  DEPENDENCIES_CHART_VERSION: "v2.0.0"
+  TRAEFIK_CHART_VERSION: "39.0.0"
 jobs:
   approve:
     environment: ${{ inputs.environment }}
@@ -56,16 +59,13 @@ jobs:
         run: |
           touch environments/${ENV}/traefik/values.override.yaml
           kubectl scale deployment traefik --replicas=0 --namespace traefik || true
-          helm upgrade --install traefik oci://ghcr.io/traefik/helm/traefik:39.0.0 \
+          helm upgrade --install traefik oci://ghcr.io/traefik/helm/traefik:${TRAEFIK_CHART_VERSION} \
             --namespace traefik \
             --create-namespace \
             -f environments/${ENV}/traefik/values.yaml \
             -f environments/${ENV}/traefik/values.override.yaml
-          kubectl scale deployment traefik --replicas=1 --namespace traefik
-      - name: Install stern
-        run: |
-          curl -L https://github.com/stern/stern/releases/download/v1.28.0/stern_1.28.0_linux_amd64.tar.gz | tar xz
-          sudo mv stern /usr/local/bin/
+          kubectl scale deployment traefik --replicas=1 --namespace traefik || true
+
       - name: Install OpenCRVS dependencies
         id: deploy
         run: |
@@ -78,7 +78,7 @@ jobs:
             . &
           STERN_PID=$!
           touch environments/${ENV}/dependencies/values.override.yaml
-          helm upgrade --install opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart \
+          helm upgrade --install opencrvs-deps oci://ghcr.io/opencrvs/opencrvs-dependencies-chart:${DEPENDENCIES_CHART_VERSION} \
             --namespace "opencrvs-deps-${ENV}" \
             -f environments/${ENV}/dependencies/values.yaml \
             -f environments/${ENV}/dependencies/values.override.yaml \

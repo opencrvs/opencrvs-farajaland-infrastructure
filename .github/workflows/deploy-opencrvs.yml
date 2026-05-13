@@ -16,15 +16,15 @@ on:
       core-image-tag:
         description: "Tag of the core image"
         required: true
-        default: "v1.9.10"
+        default: "v2.0.0"
       countryconfig-image-tag:
         description: "Tag of the countryconfig image"
         required: true
-        default: "v1.9.10"
+        default: "v2.0.0"
       data-seed-enabled:
-        description: "Enable data seeding during deployment"
+        description: "Data seeding during deployment"
         required: false
-        default: "true"
+        default: "false"
         type: boolean
       environment:
         description: "Target environment"
@@ -34,6 +34,9 @@ on:
         options:
           - ""
 
+env:
+  # Assuming chart version matches core image tag
+  OPENCRVS_CHART_VERSION: "v2.0.0"
 jobs:
   approve:
     environment: ${{ inputs.environment }}
@@ -120,10 +123,7 @@ jobs:
             | kubectl apply -n opencrvs-${ENV} -f - \
             || echo "Secret $secret doesn't exist in opencrvs-deps-${ENV} namespace"
           done
-      - name: Install stern
-        run: |
-          curl -L https://github.com/stern/stern/releases/download/v1.28.0/stern_1.28.0_linux_amd64.tar.gz | tar xz
-          sudo mv stern /usr/local/bin/
+
       - name: Deploy with Helm
         id: deploy
         run: |
@@ -136,7 +136,7 @@ jobs:
             . &
           STERN_PID=$!
           touch environments/${ENV}/opencrvs-services/values.override.yaml
-          helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services:0.1.29 \
+          helm upgrade --install opencrvs oci://ghcr.io/opencrvs/opencrvs-services:${OPENCRVS_CHART_VERSION} \
             --timeout 15m \
             --namespace "opencrvs-${ENV}" \
             -f environments/${ENV}/opencrvs-services/values.yaml \
@@ -145,12 +145,14 @@ jobs:
             --atomic \
             --wait \
             --wait-for-jobs \
-            --set image.tag="$CORE_IMAGE_TAG" \
+            --set platform.tag="$CORE_IMAGE_TAG" \
             --set countryconfig.image.tag="$COUNTRYCONFIG_IMAGE_TAG" \
             --set countryconfig.image.name="$COUNTRYCONFIG_IMAGE_NAME" \
             --set data_seed.env.ACTIVATE_USERS="${{ vars.ACTIVATE_USERS || 'false' }}" \
             --set data_seed.enabled="${{ inputs.data-seed-enabled }}" \
+            --set env.CONTENT_SECURITY_POLICY_WILDCARD="${{ vars.CONTENT_SECURITY_POLICY_WILDCARD }}" \
             --set hostname=${{ vars.DOMAIN }} 2>&1 ; STATUS=$?;
+
             kill $STERN_PID 2>/dev/null || true
             exit $STATUS
       - name: Cleanup Helm Locks

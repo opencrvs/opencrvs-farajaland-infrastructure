@@ -93,6 +93,10 @@
       include_tasks: tasks/k8s/label-nodes.yml
     - name: Install metrics server on control plane
       include_tasks: tasks/k8s/metrics-server.yml
+    - name: Install helm
+      include_tasks: tasks/k8s/install-helm.yml
+    - name: Install cert-manager
+      include_tasks: tasks/k8s/cert-manager.yml
     - name: Install k8s self-hosted runner
       include_tasks: tasks/k8s/self-hosted-runner.yml
 
