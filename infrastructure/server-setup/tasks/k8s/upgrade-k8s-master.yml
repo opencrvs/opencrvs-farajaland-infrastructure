@@ -73,7 +73,6 @@
   ansible.builtin.shell: kubeadm upgrade plan
   retries: 3
   delay: 20
-  when: upgrade_needed
 
 - name: Apply kubeadm upgrade to kubelet version
   when: upgrade_needed
