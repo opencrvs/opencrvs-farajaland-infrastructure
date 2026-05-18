@@ -69,12 +69,75 @@ check_ubuntu_version() {
     echo "Ubuntu version OK."
 }
 
+curl_check_url() {
+    local url="$1"
+    local http_code
+
+    http_code="$(curl \
+        --silent \
+        --location \
+        --head \
+        --retry 3 \
+        --retry-delay 2 \
+        --retry-all-errors \
+        --max-time 10 \
+        --output /dev/null \
+        --write-out "%{http_code}" \
+        "$url" || true)"
+
+    # 000 means curl could not connect / DNS failed / TLS failed / timed out.
+    if [ "$http_code" = "000" ]; then
+        return 1
+    fi
+
+    return 0
+}
 
 check_internet() {
-    echo "Testing internet connectivity (ping google.com)..."
-    if ! ping -c 2 google.com >/dev/null 2>&1; then
-      abort "Internet connectivity failed (cannot reach google.com)"
+    local urls=(
+        "https://raw.githubusercontent.com/"
+        "https://get.helm.sh"
+        "https://pkgs.k8s.io"
+        "https://archive.ubuntu.com"
+        "https://changelogs.ubuntu.com"
+        "https://hub.docker.com"
+        "https://auth.docker.io"
+        "https://registry-1.docker.io"
+        "https://download.docker.com"
+        "https://sentry.io"
+        "https://fonts.gstatic.com"
+        "https://storage.googleapis.com"
+        "https://fonts.googleapis.com"
+        "https://github.com"
+        "https://acme-v02.api.letsencrypt.org"
+        "https://registry.npmjs.org"
+        "https://registry.yarnpkg.com"
+        "https://eu.ui-avatars.com"
+    )
+
+    local failed=0
+
+    echo "Testing outbound HTTPS connectivity..."
+    echo
+
+    printf "%-40s %-10s\n" "URL" "STATUS"
+    printf "%-40s %-10s\n" "----------------------------------------" "----------"
+
+    for url in "${urls[@]}"; do
+        if curl_check_url "$url"; then
+            printf "%-45s %-10s\n" "$url" "OK"
+        else
+            printf "%-45s %-10s\n" "$url" "FAILED"
+            failed=1
+        fi
+    done
+
+    echo
+
+    if [ "$failed" -ne 0 ]; then
+        abort "Internet connectivity check failed. Some required endpoints are unreachable."
     fi
+
     echo "Internet connectivity OK."
 }
 
