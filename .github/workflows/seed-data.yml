@@ -9,7 +9,14 @@ on:
         default: "development"
         type: choice
         options:
+<<<<<<< HEAD
           - ""
+=======
+          - demo
+          - demo-staging
+          - integration
+
+>>>>>>> b4e0bb1 (drop production environment)
   workflow_call:
     inputs:
       environment:
