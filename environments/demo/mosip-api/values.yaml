@@ -1,3 +1,9 @@
 ingress:
   tls_resolver: letsencrypt
   ssl_enabled: true
+
+mosip_mock:
+  enabled: true
+  secrets:
+    mosip-mock-config:
+      - ALERT_EMAIL
