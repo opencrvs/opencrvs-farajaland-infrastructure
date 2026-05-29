@@ -5,7 +5,7 @@ ingress:
 mosip_api:
   enabled: true
   image:
-    tag: 2.0.0-rc.9
+    tag: 2.0.0-rc.10
   env:
     ESIGNET_TOKEN_URL: "https://esignet-mosipid.collab.mosip.net/v1/esignet/oauth/v2/token"
     ESIGNET_USERINFO_URL: "https://esignet-mosipid.collab.mosip.net/v1/esignet/oidc/userinfo"
