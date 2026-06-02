@@ -23,6 +23,10 @@ env:
   APN_SERVICE_URL: "http://apm-server.opencrvs-deps-demo-staging.svc.cluster.local:8200"
   MINIO_BUCKET: ocrvs
 
+auth:
+  env:
+    TWO_FA_ENABLED: true
+
 events:
   env:
     TWO_FA_ENABLED: true
@@ -32,7 +36,6 @@ influxdb:
 elasticsearch:
   auth_mode: auto
   host: elasticsearch.opencrvs-deps-demo-staging.svc.cluster.local
-
 
 minio:
   auth_mode: use_secret
