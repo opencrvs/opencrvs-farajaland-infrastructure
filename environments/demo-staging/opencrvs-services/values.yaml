@@ -25,11 +25,11 @@ env:
 
 auth:
   env:
-    TWO_FA_ENABLED: false
+    TWO_FA_ENABLED: true
 
 events:
   env:
-    TWO_FA_ENABLED: false
+    TWO_FA_ENABLED: true
 
 influxdb:
   host: influxdb-0.influxdb.opencrvs-deps-demo-staging.svc.cluster.local
