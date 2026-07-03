@@ -20,36 +20,28 @@ hpa:
   enabled: false
 
 env:
-  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-demo.svc.cluster.local:8200"
-  MINIO_BUCKET: ocrvs
-
-auth:
-  env:
-    TWO_FA_ENABLED: false
-
-events:
-  env:
-    TWO_FA_ENABLED: false
-
+  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-integration.svc.cluster.local:8200"
+  QA_ENV: true
 elasticsearch:
   auth_mode: auto
-  host: elasticsearch.opencrvs-deps-demo.svc.cluster.local
+  host: elasticsearch.opencrvs-deps-integration.svc.cluster.local
+
 
 minio:
   auth_mode: use_secret
-  host: minio-0.minio.opencrvs-deps-demo.svc.cluster.local
+  host: minio-0.minio.opencrvs-deps-integration.svc.cluster.local
 
 mongodb:
   auth_mode: auto
-  host: mongodb-0.mongodb.opencrvs-deps-demo.svc.cluster.local
+  host: mongodb-0.mongodb.opencrvs-deps-integration.svc.cluster.local
 
 redis:
   auth_mode: use_secret
-  host: redis-0.redis.opencrvs-deps-demo.svc.cluster.local
+  host: redis-0.redis.opencrvs-deps-integration.svc.cluster.local
 
 postgres:
   auth_mode: auto
-  host: postgres-0.postgres.opencrvs-deps-demo.svc.cluster.local
+  host: postgres-0.postgres.opencrvs-deps-integration.svc.cluster.local
 
 imagePullSecrets:
   # Default value for credentials created while yarn environment:init
