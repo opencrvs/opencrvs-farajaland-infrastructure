@@ -15,7 +15,6 @@ Following components are included into deployment:
   - Elasticsearch
   - Redis
   - MinIO
-  - InfluxDB
 - Monitoring and Logging, see OpenCRVS dependencies helm chart for exact versions:
   - Kibana
   - Logstash

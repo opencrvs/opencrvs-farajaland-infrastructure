@@ -24,9 +24,6 @@ env:
   MINIO_BUCKET: ocrvs
   OPENCRVS_ENVIRONMENT: {{opencrvs_environment}}
 
-influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-{{env}}.svc.cluster.local
-
 elasticsearch:
   auth_mode: auto
   host: elasticsearch.opencrvs-deps-{{env}}.svc.cluster.local
