@@ -16,8 +16,5 @@ mongodb:
 postgres:
   host_data_path: /data/demo-staging/postgres
 
-influxdb:
-  host_data_path: /data/demo-staging/influxdb
-
 monitoring:
   enabled: false

@@ -1,8 +1,6 @@
 chart_dev_mode: true
 
 hostname: aws.opencrvs.dev
-influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-demo.svc.cluster.local
 elasticsearch:
   auth_mode: auto
   port: 9200

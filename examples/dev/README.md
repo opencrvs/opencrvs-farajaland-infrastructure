@@ -24,7 +24,6 @@ The deployment package includes the following components:
   * Elasticsearch
   * Redis
   * MinIO
-  * InfluxDB
 
 * **Monitoring and Logging** (via the dependencies Helm chart):
 
