@@ -26,3 +26,11 @@ postgres_on_deploy:
       - REFERENCE_DATA_POSTGRES_PASSWORD
       - REFERENCE_DATA_EDITOR_USER
       - REFERENCE_DATA_EDITOR_PASSWORD
+
+auth:
+  env:
+    TWO_FA_ENABLED: false
+
+events:
+  env:
+    TWO_FA_ENABLED: false
