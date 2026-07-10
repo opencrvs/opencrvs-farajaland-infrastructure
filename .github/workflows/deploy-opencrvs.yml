@@ -35,6 +35,7 @@ on:
           - demo
           - demo-staging
           - integration
+          - production
 
 env:
   # Assuming chart version matches core image tag

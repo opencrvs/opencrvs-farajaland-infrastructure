@@ -15,6 +15,7 @@ on:
           - demo
           - demo-staging
           - integration
+          - production
 
 >>>>>>> b4e0bb1 (drop production environment)
   workflow_call:

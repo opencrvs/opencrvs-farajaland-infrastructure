@@ -1,0 +1,20 @@
+##################################################################################
+# Environment-specific Helm overrides managed by yarn environment:init
+# Unmanaged keys are preserved when this file is updated.
+##################################################################################
+hostname: farajaland.opencrvs.org
+
+elasticsearch:
+  host_data_path: /data/production/elasticsearch
+
+minio:
+  host_data_path: /data/production/minio
+
+mongodb:
+  host_data_path: /data/production/mongodb
+
+postgres:
+  host_data_path: /data/production/postgres
+
+influxdb:
+  host_data_path: /data/production/influxdb
