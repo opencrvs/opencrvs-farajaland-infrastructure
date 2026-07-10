@@ -33,9 +33,9 @@ on:
         type: choice
         options:
           - demo
-          - demo-staging
           - integration
-          - prod
+          - production
+          - staging
 
 env:
   # Assuming chart version matches core image tag

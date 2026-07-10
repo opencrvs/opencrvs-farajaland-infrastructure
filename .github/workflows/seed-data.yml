@@ -10,9 +10,10 @@ on:
         type: choice
         options:
           - demo
-          - demo-staging
           - integration
-          - prod
+          - production
+          - staging
+
   workflow_call:
     inputs:
       environment:

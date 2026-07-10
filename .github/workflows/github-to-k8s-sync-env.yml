@@ -11,9 +11,10 @@ on:
         type: choice
         options:
           - demo
-          - demo-staging
           - integration
-          - prod
+          - production
+          - staging
+
       namespace_template:
         description: "Secrets mapping template"
         default: "opencrvs"
