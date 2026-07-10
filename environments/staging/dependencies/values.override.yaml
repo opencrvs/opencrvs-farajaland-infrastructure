@@ -3,3 +3,6 @@
 # Unmanaged keys are preserved when this file is updated.
 ##################################################################################
 hostname: farajaland-staging.opencrvs.org
+
+monitoring:
+  enabled: false
