@@ -13,6 +13,7 @@ on:
           - demo-staging
           - integration
           - production
+          - staging
 
   workflow_call:
     inputs:
