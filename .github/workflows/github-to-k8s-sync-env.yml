@@ -10,8 +10,6 @@ on:
         default: "development"
         type: choice
         options:
-          - demo
-          - demo-staging
           - integration
           - production
           - staging
