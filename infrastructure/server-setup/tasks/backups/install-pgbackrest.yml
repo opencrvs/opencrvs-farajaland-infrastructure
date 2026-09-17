@@ -37,4 +37,4 @@
     # FIXME: Is there any smarter way to configure file per user?
     content: |
       [global]
-      repo1-path={{ backup_server_user_home }}/{{ k8s_cluster_env }}
+      repo1-path={{ backup_server_user_home }}/{{ kube_cluster_env }}

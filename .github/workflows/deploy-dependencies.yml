@@ -6,15 +6,14 @@ on:
       environment:
         description: "Target environment"
         required: true
-        default: "dev"
+        default: "development"
         type: choice
         options:
-          - demo
-          - demo-staging
           - integration
-          - prod
+          - production
+          - staging
 env:
-  DEPENDENCIES_CHART_VERSION: "v2.0.0"
+  DEPENDENCIES_CHART_VERSION: "v2.0.1"
   TRAEFIK_CHART_VERSION: "39.0.0"
 jobs:
   approve:

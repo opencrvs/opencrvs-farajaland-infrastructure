@@ -12,33 +12,17 @@
   "license": "MPL-2.0",
   "husky": {},
   "scripts": {
-    "environment:init": "ts-node infrastructure/environments/setup-environment.ts",
+    "environment:init": "opencrvs environment init",
     "environment:upgrade": "yarn environment:init",
-    "environment:swarm-to-k8s": "ts-node infrastructure/environments/swarm-to-k8s.ts",
-    "environment:users": "ts-node infrastructure/environments/users.ts",
-    "environment:update-workflows": "ts-node infrastructure/environments/update-workflows.ts",
+    "environment:swarm-to-k8s": "opencrvs environment swarm-to-k8s",
+    "environment:users": "opencrvs environment users",
+    "environment:update-workflows": "opencrvs environment update-workflows",
     "prepare": "husky"
   },
   "devDependencies": {
-    "@inquirer/prompts": "^8.3.0",
-    "@octokit/core": "4.2.1",
-    "@types/libsodium-wrappers": "^0.7.10",
-    "@types/prompts": "^2.4.9",
-    "@types/js-yaml": "4.0.9",
-    "@types/ssh2": "^1.15.5",
-    "husky": "9.1.7",
-    "kleur": "^4.1.5",
-    "libsodium-wrappers": "^0.7.13",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6",
-    "js-yaml": "4.1.0",
-    "glob": "11.0.3",
-    "handlebars": "^4.7.8"
+    "husky": "9.1.7"
   },
   "dependencies": {
-    "@types/node": "^24.0.0",
-    "dotenv": "^16.4.5",
-    "prompts": "^2.4.2",
-    "ssh2": "^1.17.0"
+    "@opencrvs/toolkit": "2.0.0-rc.517e1aa"
   }
 }

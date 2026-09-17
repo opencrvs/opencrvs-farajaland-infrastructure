@@ -10,7 +10,6 @@ on:
         type: choice
         options:
           - integration
-          - prod
       release_name:
         description: "Name of the release to deploy"
         required: true

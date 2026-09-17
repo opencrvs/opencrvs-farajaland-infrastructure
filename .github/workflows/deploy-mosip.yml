@@ -13,11 +13,9 @@ on:
         default: "dev"
         type: choice
         options:
-          - demo
-          - demo-staging
           - integration
-          - prod
-
+          - staging
+          - production
 env:
   # Assuming chart version matches core image tag
   MOSIP_CHART_VERSION: "v2.0.0"

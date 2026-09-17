@@ -100,9 +100,9 @@ if [[ ! -f "runner.tar.gz" ]]; then
     echo "❌ Failed to fetch GitHub runner URL. Check your internet connection and 'jq'."
     exit 1
   fi
-
+  # FIXME:Fails with permission denied if run as non-root without sudo, so we use sudo for the download step
   echo "[+] Download URL: $RUNNER_LATEST_URL into folder $(pwd)"
-  if ! curl -fL "$RUNNER_LATEST_URL" -o runner.tar.gz; then
+  if ! sudo -u $RUNAS_USER curl -fL "$RUNNER_LATEST_URL" -o runner.tar.gz; then
     echo "❌ Failed to download runner archive."
     exit 1
   fi
@@ -111,9 +111,9 @@ else
 fi
 
 echo "[+] Extracting runner..."
-tar xzf runner.tar.gz
+sudo -u $RUNAS_USER tar xzf runner.tar.gz
 echo "[+] Setting permissions... `pwd`"
-chown -R $RUNAS_USER:$RUNAS_GROUP .
+sudo chown -R $RUNAS_USER:$RUNAS_GROUP .
 # --- GET REGISTRATION TOKEN ---
 echo "[+] Requesting registration token..."
 REG_TOKEN=$(curl -s -X POST \
@@ -133,7 +133,7 @@ sudo -u $RUNAS_USER ./config.sh \
 # --- SETUP SYSTEMD SERVICE ---
 echo "[+] Installing systemd service..."
 
-sudo ./svc.sh install
+sudo ./svc.sh install provision
 
 # Fix service to run as specific user/group
 SERVICE_FILE_PATH=$(ls /etc/systemd/system/actions.runner.*.service 2>/dev/null | head -n1)

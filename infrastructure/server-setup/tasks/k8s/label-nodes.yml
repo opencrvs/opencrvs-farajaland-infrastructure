@@ -1,6 +1,6 @@
 - name: Build list of labelable nodes
   ansible.builtin.set_fact:
-    k8s_nodes_to_label: >-
+    kube_nodes_to_label: >-
       {{
         (
           groups['master'] + (groups['workers'] | default([]))
@@ -20,5 +20,5 @@
     merge_type:
       - strategic-merge
       - merge
-  loop: "{{ k8s_nodes_to_label }}"
+  loop: "{{ kube_nodes_to_label }}"
   when: item.labels is defined

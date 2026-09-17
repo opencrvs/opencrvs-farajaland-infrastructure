@@ -10,22 +10,15 @@ env:
   APN_SERVICE_URL: "http://apm-server.opencrvs-deps-demo.svc.cluster.local:8200"
 
 hostname: test-k8s.opencrvs.dev
-influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-demo.svc.cluster.local
 elasticsearch:
   auth_mode: auto
   port: 9200
   host: elasticsearch.opencrvs-deps-demo.svc.cluster.local
 
-
 minio:
   auth_mode: use_secret
   host: minio-0.minio.opencrvs-deps-demo.svc.cluster.local
   external_hostname: minio.test-k8s.opencrvs.dev
-
-mongodb:
-  auth_mode: auto
-  host: mongodb-0.mongodb.opencrvs-deps-demo.svc.cluster.local
 
 redis:
   auth_mode: disabled

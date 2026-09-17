@@ -10,10 +10,9 @@ on:
       environment:
         type: choice
         description: Infrastructure to provision
-        default: 
+        default: "development"
         required: true
         options:
-          - prod
           - integration
           - demo
 
