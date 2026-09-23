@@ -7,6 +7,9 @@ hostname: farajaland-staging.opencrvs.org
 
 imagePullSecrets: {}
 
+env:
+  APN_SERVICE_URL: http://apm-server.opencrvs-deps-production.svc.cluster.local:8200
+
 countryconfig:
   secrets:
     reference-data-db-secret:
