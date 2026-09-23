@@ -9,7 +9,9 @@ on:
         default: "development"
         type: choice
         options:
-          - ""
+          - integration
+          - production
+          - staging
 env:
   DEPENDENCIES_CHART_VERSION: "v2.1.0"
   TRAEFIK_CHART_VERSION: "41.0.2"

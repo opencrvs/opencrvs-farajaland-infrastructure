@@ -13,7 +13,9 @@ on:
         default: "development"
         required: true
         options:
-          - ""
+          - integration
+          - demo
+
 jobs:
   approve:
     environment: ${{ inputs.environment }}

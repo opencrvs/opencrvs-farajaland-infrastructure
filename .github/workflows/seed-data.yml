@@ -9,7 +9,10 @@ on:
         default: "development"
         type: choice
         options:
-          - ""
+          - integration
+          - production
+          - staging
+
   workflow_call:
     inputs:
       environment:
