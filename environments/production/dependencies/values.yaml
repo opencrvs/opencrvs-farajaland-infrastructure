@@ -20,8 +20,8 @@ node_selector:
 
 minio:
   use_default_credentials: false
-  restore:
-    type: dump
+  backup:
+    type: differential
 
 elasticsearch:
   use_default_credentials: false
@@ -31,31 +31,39 @@ mongodb:
 
 postgres:
   use_default_credentials: false
-  restore:
-    type: dump
+  backup:
+    type: differential
 
 redis:
   auth_mode: acl
 
 monitoring:
-  enabled: false
+  enabled: true
 
 elastalert:
   env:
-    HTTP_POST2_ALERT_URL: http://countryconfig.opencrvs-demo-staging.svc.cluster.local:3040/email
-
+    NOTIFICATION_TYPE: email
+  secrets:
+    smtp-config:
+      - ALERT_EMAIL
+      - SENDER_EMAIL_ADDRESS
+      - SMTP_HOST
+      - SMTP_PASSWORD
+      - SMTP_PORT
+      - SMTP_SECURE
+      - SMTP_USERNAME
 # Backup configuration
 backup:
-  enabled: false
+  enabled: true
   schedule: "0 1 * * *"
   backup_server_secret: backup-server-ssh-credentials
-  backup_server_dir: /home/backup/demo-staging
+  backup_server_dir: /home/backup/production
 
 
 # Restore configuration
 restore:
-  enabled: true
+  enabled: false
   schedule: "0 0 * * *"
   backup_server_secret: backup-server-ssh-credentials
-  backup_server_dir: /home/backup/demo
+  backup_server_dir: /home/backup/
   backup_encryption_secret: restore-encryption-secret

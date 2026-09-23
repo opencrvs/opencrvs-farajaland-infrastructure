@@ -22,8 +22,6 @@ hpa:
 env:
   APN_SERVICE_URL: "http://apm-server.opencrvs-deps-integration.svc.cluster.local:8200"
   QA_ENV: true
-influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-integration.svc.cluster.local
 elasticsearch:
   auth_mode: auto
   host: elasticsearch.opencrvs-deps-integration.svc.cluster.local

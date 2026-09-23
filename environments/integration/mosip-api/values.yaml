@@ -5,7 +5,7 @@ ingress:
 mosip_api:
   enabled: true
   image:
-    tag: 2.0.0-demo.5
+    tag: 2.1.0-rc.1
   env:
     ESIGNET_TOKEN_URL: "https://esignet-mosipid.collab.mosip.net/v1/esignet/oauth/v2/token"
     ESIGNET_USERINFO_URL: "https://esignet-mosipid.collab.mosip.net/v1/esignet/oidc/userinfo"
@@ -25,6 +25,8 @@ mosip_api:
     MOSIP_WEBSUB_TOPIC: "crvs_partner/CREDENTIAL_ISSUED"
     OIDP_CLIENT_PRIVATE_KEY_PATH: "/certs/esignet-jwk.txt"
     PARTNER_MISP_LK: "opencrvs-auth-partner"
+    # Warning! Do not enable this in country environments
+    UNSAFE_DEBUG_LOG: "true"
   secrets:
     mosip-api-config:
       - DECRYPT_P12_FILE_PASSWORD

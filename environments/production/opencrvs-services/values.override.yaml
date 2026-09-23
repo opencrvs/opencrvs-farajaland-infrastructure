@@ -1,9 +1,11 @@
 ##################################################################################
-# Use this file to customize helm chart behavior
-# Please make sure your custom changes doesn't conflict with values.yaml
+# Environment-specific Helm overrides managed by yarn environment:init
+# Unmanaged keys are preserved when this file is updated.
 ##################################################################################
-env:
-  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-demo.svc.cluster.local:8200"
+hostname: farajaland.opencrvs.org
+
+imagePullSecrets: {}
+
 countryconfig:
   secrets:
     reference-data-db-secret:
@@ -11,8 +13,8 @@ countryconfig:
   env:
     OPENID_PROVIDER_CLAIMS: name,family_name,given_name,middle_name,birthdate,address
     OPENID_PROVIDER_CLIENT_ID: mock-client_id
-    ESIGNET_REDIRECT_URL: https://esignet-mock.farajaland-demo-staging.opencrvs.org/authorize
-    MOSIP_API_USERINFO_URL: https://mosip-api.farajaland-demo-staging.opencrvs.org/esignet/get-oidp-user-info
+    ESIGNET_REDIRECT_URL: https://esignet-mock.farajaland.opencrvs.org/authorize
+    MOSIP_API_USERINFO_URL: https://mosip-api.farajaland.opencrvs.org/esignet/get-oidp-user-info
     VERIFIABLE_CREDENTIALS_SDJWT_ISSUE_URL: https://proxy.issuer.opencrvs.dev/openid4vc/sdjwt/issue
     VERIFIABLE_CREDENTIALS_RAW_JWT_SIGN_URL: https://proxy.issuer.opencrvs.dev/raw/jwt/sign
 
@@ -24,3 +26,11 @@ postgres_on_deploy:
       - REFERENCE_DATA_POSTGRES_PASSWORD
       - REFERENCE_DATA_EDITOR_USER
       - REFERENCE_DATA_EDITOR_PASSWORD
+
+auth:
+  env:
+    TWO_FA_ENABLED: false
+
+events:
+  env:
+    TWO_FA_ENABLED: false

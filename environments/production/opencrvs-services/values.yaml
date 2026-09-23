@@ -14,45 +14,51 @@
 # - hostname: valid DNS name for opencrvs
 # - countryconfig.image.name: Countryconfig image repository
 # - countryconfig.image.tag: Countryconfig image tag
-environment_type: non-production
+environment_type: production
 
 hpa:
   enabled: false
 
 env:
-  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-demo-staging.svc.cluster.local:8200"
+  APN_SERVICE_URL: "http://apm-server.opencrvs-deps-production.svc.cluster.local:8200"
   MINIO_BUCKET: ocrvs
 
-events:
-  env:
-    TWO_FA_ENABLED: false
-
 influxdb:
-  host: influxdb-0.influxdb.opencrvs-deps-demo-staging.svc.cluster.local
+  host: influxdb-0.influxdb.opencrvs-deps-production.svc.cluster.local
+
 elasticsearch:
   auth_mode: auto
-  host: elasticsearch.opencrvs-deps-demo-staging.svc.cluster.local
-
+  host: elasticsearch.opencrvs-deps-production.svc.cluster.local
 
 minio:
   auth_mode: use_secret
-  host: minio-0.minio.opencrvs-deps-demo-staging.svc.cluster.local
+  host: minio-0.minio.opencrvs-deps-production.svc.cluster.local
 
 mongodb:
   auth_mode: auto
-  host: mongodb-0.mongodb.opencrvs-deps-demo-staging.svc.cluster.local
+  host: mongodb-0.mongodb.opencrvs-deps-production.svc.cluster.local
 
 redis:
   auth_mode: use_secret
-  host: redis-0.redis.opencrvs-deps-demo-staging.svc.cluster.local
+  host: redis-0.redis.opencrvs-deps-production.svc.cluster.local
 
 postgres:
   auth_mode: auto
-  host: postgres-0.postgres.opencrvs-deps-demo-staging.svc.cluster.local
+  host: postgres-0.postgres.opencrvs-deps-production.svc.cluster.local
 
-imagePullSecrets:
-  # Default value for credentials created while yarn environment:init
-  - name: dockerhub-credentials
+platform:
+  imagePullSecrets:
+    # Default value for credentials created while yarn environment:init
+    - name: dockerhub-credentials
+
+
+auth:
+  env:
+    TWO_FA_ENABLED: true
+
+events:
+  env:
+    TWO_FA_ENABLED: true
 
 countryconfig:
   secrets:
@@ -70,4 +76,4 @@ dashboards:
   enabled: true
 
 on_restore_cronjob:
-  enabled: true
+  enabled: false
