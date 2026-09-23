@@ -1,0 +1,94 @@
+name: 10. Validate pre/post deploy
+run-name: "Validate ${{ inputs.stage }} on ${{ inputs.environment }} environment (core: ${{ inputs.core-image-tag }})"
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "development"
+        type: choice
+        options:
+          - ""
+      stage:
+        description: "Target stage"
+        required: true
+        default: "predeploy"
+        type: choice
+        options:
+          - "predeploy"
+          - "postdeploy"
+      core-image-tag:
+        description: "Tag of the core image"
+        required: true
+        default: "v2.1.0"
+        type: string
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+      stage:
+        type: string
+      core-image-tag:
+        type: string
+env:
+  # Assuming chart version matches core image tag
+  OPENCRVS_CHART_VERSION: "v2.1.0"
+jobs:
+  validate:
+    name: "Validate ${{ inputs.stage }}"
+    environment: ${{ inputs.environment }}
+    env:
+      ENV: ${{ inputs.environment }}
+      namespace: opencrvs-${{ inputs.environment }}
+    runs-on:
+      - self-hosted
+      - k8s
+      - ${{ inputs.environment }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+      - name: Create namespace
+        run: kubectl create namespace "opencrvs-${ENV}" || true
+      - name: Create job validate-${{ inputs.stage }} from helm template and apply it
+        run: |
+          kubectl delete job -n ${namespace} --ignore-not-found=true validate-${{ inputs.stage }}
+          echo "Templating chart ${{ env.OPENCRVS_CHART_VERSION }} with core image ${{ inputs.core-image-tag }}"
+          touch environments/${ENV}/opencrvs-services/values.override.yaml
+          helm template \
+            --version ${{ env.OPENCRVS_CHART_VERSION }} \
+            -f environments/${ENV}/opencrvs-services/values.yaml \
+            -f environments/${ENV}/opencrvs-services/values.override.yaml \
+            --namespace ${namespace} \
+            --set platform.tag="${{ inputs.core-image-tag }}" \
+            --set validation.enabled=true \
+            --set hostname=${{ vars.DOMAIN }} \
+            --show-only templates/service-accounts.yaml \
+            --show-only templates/validate-${{ inputs.stage }}-job.yaml \
+            oci://ghcr.io/opencrvs/opencrvs-services \
+            | kubectl apply -n ${namespace} --wait=true -f -
+          echo "✅ validate-${{ inputs.stage }} job created successfully"
+      - name: Checking validate-${{ inputs.stage }} job status
+        run: |
+          while true; do
+            kubectl wait --for=condition=ready pod -ljob-name=validate-${{ inputs.stage }} --timeout=30s -n ${namespace} && \
+            kubectl logs job/validate-${{ inputs.stage }} --all-containers -f -n ${namespace} && \
+            touch /tmp/logs_stramed-${namespace}-validate-${{ inputs.stage }}.txt || break; 
+            sleep 1; done &
+          echo "---------------------- Waiting for job completion ----------------------"
+          kubectl wait --for=condition=complete job/validate-${{ inputs.stage }} -n ${namespace} --timeout=60s; status=$? || true
+          [ $status -ne 0 ] && kubectl get pods -n ${namespace} --show-labels && kubectl describe pod -ljob-name=validate-${{ inputs.stage }} -n ${namespace};
+          [ ! -f /tmp/logs_stramed-${namespace}-validate-${{ inputs.stage }}.txt ] && kubectl logs job/validate-${{ inputs.stage }} --all-containers -n ${namespace} || \
+            rm -vf /tmp/logs_stramed-${namespace}-validate-${{ inputs.stage }}.txt
+          kill %1 2>/dev/null && echo "Stopped log streaming" || true
+          kubectl logs job/validate-${{ inputs.stage }} -n "${namespace}" > opencrvs-validation.log
+          {
+            echo "## OpenCRVS ${{ inputs.stage }} validation"
+            echo
+            awk '
+              /<!-- OPENCRVS_VALIDATION_SUMMARY_START -->/ { capture=1; next }
+              /<!-- OPENCRVS_VALIDATION_SUMMARY_END -->/ { capture=0 }
+              capture
+            ' opencrvs-validation.log
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $status

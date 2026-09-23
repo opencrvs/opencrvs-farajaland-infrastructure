@@ -13,12 +13,12 @@ on:
           - production
           - staging
 env:
-  DEPENDENCIES_CHART_VERSION: "v2.0.1"
-  TRAEFIK_CHART_VERSION: "39.0.0"
+  DEPENDENCIES_CHART_VERSION: "v2.1.0"
+  TRAEFIK_CHART_VERSION: "41.0.2"
 jobs:
   approve:
     environment: ${{ inputs.environment }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
       - name: Waiting for manual approval
@@ -67,7 +67,8 @@ jobs:
             -f environments/${ENV}/traefik/values.yaml \
             -f environments/${ENV}/traefik/values.override.yaml
           kubectl scale deployment traefik --replicas=1 --namespace traefik || true
-
+      # FIXME: remove BACKUP_HOST/RESTORE_HOST after v2.2
+      # See: https://github.com/opencrvs/opencrvs-core/pull/13502
       - name: Install OpenCRVS dependencies
         id: deploy
         run: |
@@ -84,6 +85,8 @@ jobs:
             --namespace "opencrvs-deps-${ENV}" \
             -f environments/${ENV}/dependencies/values.yaml \
             -f environments/${ENV}/dependencies/values.override.yaml \
+            --set backup.host=${{ vars.BACKUP_HOST }} \
+            --set restore.host=${{ vars.RESTORE_HOST }} \
             --create-namespace \
             --timeout 15m \
             --set hostname=${{ vars.DOMAIN }} \
@@ -91,6 +94,30 @@ jobs:
 
           kill $STERN_PID 2>/dev/null || true
           exit $STATUS
+      # FIXME: Implement vars.MONITORING_ENABLED check to conditionally install OpenTelemetry Collector
+      # https://github.com/opencrvs/opencrvs-core/issues/13377
+      - name: Install OpenTelemetry Collector
+        run: |
+          [ ! -f environments/${ENV}/opentelemetry/values.yaml ] && echo "No OpenTelemetry values.yaml found for environment ${ENV}, skipping installation" && exit 0
+          helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts || true
+          touch environments/${ENV}/opentelemetry/values.override.yaml
+          helm upgrade --install opentelemetry-collector open-telemetry/opentelemetry-collector \
+            --namespace traefik \
+            --create-namespace \
+            --namespace "opencrvs-deps-${ENV}" \
+            --set image.repository="otel/opentelemetry-collector-k8s" \
+            --set mode=deployment \
+            -f environments/${ENV}/opentelemetry/values.yaml \
+            -f environments/${ENV}/opentelemetry/values.override.yaml
+
+      - name: Cleanup Helm Locks
+        if: failure() || cancelled()
+        run: |
+          kubectl -n "opencrvs-deps-${ENV}" get secrets -l owner=helm -o json | \
+          jq -r '.items[] | select(.metadata.labels.status=="pending-install" or .metadata.labels.status=="pending-upgrade" or .metadata.labels.status=="pending-rollback") | .metadata.name' | \
+          xargs -r kubectl -n "opencrvs-deps-${ENV}" delete secret || \
+          echo "No helm locks found, all is good"
+
       - name: Send email
         if: always()
         run: |

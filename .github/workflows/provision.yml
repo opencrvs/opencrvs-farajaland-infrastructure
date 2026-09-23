@@ -32,7 +32,7 @@ on:
 jobs:
   approve:
     environment: ${{ inputs.environment }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
       - name: Waiting for manual approval
@@ -76,12 +76,13 @@ jobs:
           alert_email: ${{ secrets.ALERT_EMAIL }}
           backup_host_public_key: ${{ secrets.BACKUP_HOST_PUBLIC_KEY }}
           kube_cluster_env: ${{ inputs.environment }}
+          kube_master_node: ${{ vars.KUBE_MASTER_NODE }}
           kube_api_host: ${{ vars.KUBE_API_HOST }}
           kube_api_allowed_cidrs: ${{ vars.KUBE_API_ALLOWED_CIDRS }}
           kube_runner_token: ${{ secrets.GH_TOKEN }}
           kube_self_hosted_runner_additional_labels: ${{ vars.KUBE_SELF_HOSTED_RUNNER_ADDITIONAL_LABELS }}
       - name: checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v9
         env:
@@ -94,6 +95,7 @@ jobs:
           directory: ./infrastructure/server-setup
           # Add --verbose to get more output
           options: |-
-            --inventory inventory/${{ inputs.environment }}.yml
+            --inventory ../../environments/${{ inputs.environment }}/inventory.yml
             ${{ inputs.tags != 'all' && format('--tags={0}', inputs.tags) || '' }}
+            ${{ hashFiles(format('environments/{0}/inventory-vars.yml', inputs.environment)) != '' && format('--extra-vars @../../environments/{0}/inventory-vars.yml', inputs.environment) || '' }}
             --extra-vars ""${{ steps.ansible-variables.outputs.EXTRA_VARS }}""

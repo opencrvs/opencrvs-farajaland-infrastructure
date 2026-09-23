@@ -16,8 +16,6 @@
 set -e
 
 # Configurable params
-PROVISION_UID=1000
-PROVISION_GID=1000
 PROVISION_USER="provision"
 PROVISION_GROUP="provision"
 MIN_UBUNTU_VERSION="24.04"
@@ -62,10 +60,13 @@ done
 
 check_ubuntu_version() {
     echo "Checking Ubuntu version..."
+
     UBUNTU_VERSION=$(lsb_release -rs)
-    if [ "$UBUNTU_VERSION" != "$MIN_UBUNTU_VERSION" ]; then
-      abort "Ubuntu $MIN_UBUNTU_VERSION is required, found $UBUNTU_VERSION"
+
+    if ! dpkg --compare-versions "$UBUNTU_VERSION" ge "$MIN_UBUNTU_VERSION"; then
+        abort "Ubuntu $MIN_UBUNTU_VERSION or newer is required, found $UBUNTU_VERSION"
     fi
+
     echo "Ubuntu version OK."
 }
 
@@ -93,7 +94,7 @@ curl_check_url() {
 check_internet() {
     local urls=(
         "https://raw.githubusercontent.com/"
-        "https://get.helm.sh"
+        "https://packages.buildkite.com"
         "https://pkgs.k8s.io"
         "https://archive.ubuntu.com"
         "https://changelogs.ubuntu.com"

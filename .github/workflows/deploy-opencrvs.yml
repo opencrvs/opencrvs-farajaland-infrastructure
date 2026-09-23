@@ -42,7 +42,7 @@ env:
 jobs:
   approve:
     environment: ${{ inputs.environment }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
       - name: Waiting for manual approval
@@ -69,8 +69,17 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
     secrets: inherit
+  validate-predeploy:
+    uses: ./.github/workflows/validate-opencrvs.yml
+    with:
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.core-image-tag }}
+      stage: predeploy
+    secrets: inherit
   deploy:
-    needs: github-to-k8s-sync-env
+    needs:
+      - github-to-k8s-sync-env
+      - validate-predeploy
     environment: ${{ inputs.environment }}
     env:
       ENV: ${{ inputs.environment }}
@@ -86,7 +95,7 @@ jobs:
       - k8s
       - ${{ inputs.environment }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Generate summary
         env:
           PUBLIC_DOMAIN: ${{ vars.DOMAIN }}
@@ -190,3 +199,11 @@ jobs:
                --fail \
                --silent \
                --show-error || echo "Error: Failed to reach countryconfig service"
+  validate-postdeploy:
+    needs: deploy
+    uses: ./.github/workflows/validate-opencrvs.yml
+    with:
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.core-image-tag }}
+      stage: postdeploy
+    secrets: inherit
