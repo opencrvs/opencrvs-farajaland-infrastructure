@@ -18,7 +18,7 @@ on:
           - production
 env:
   # Assuming chart version matches core image tag
-  MOSIP_CHART_VERSION: "v2.0.0"
+  MOSIP_CHART_VERSION: "v2.1.0"
 jobs:
   github-to-k8s-sync-env:
     uses: ./.github/workflows/github-to-k8s-sync-env.yml
