@@ -22,13 +22,13 @@ accessLog:
 tracing:
   serviceName: traefik
   resourceAttributes:
-    deployment.environment.name: "production"
+    deployment.environment.name: "integration"
     service.namespace: traefik
   otlp:
     enabled: true
     grpc:
       enabled: true
-      endpoint: "opentelemetry-collector.opencrvs-deps-production.svc.cluster.local:4317"
+      endpoint: "opentelemetry-collector.opencrvs-deps-integration.svc.cluster.local:4317"
       insecure: true
 
 
