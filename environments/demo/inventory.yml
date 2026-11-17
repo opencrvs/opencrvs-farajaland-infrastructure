@@ -83,11 +83,6 @@ all:
           - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDGfWxxQHJv6Md/vBVoDH2UNm/uYgIBlFpP1mfh2Yj6jRNiQ/TQrfwpTawq0Sg+UW4LfYk5yxttsZ0h6L/v6PLiawgbMtf2ZqSviRTYSZTSihkK2zLmeJA2ByBCh57w4tR6IGqJK4w0kjYQSaaU6V5skQ4u+gnLQoKtkVQ4K34EFXAiIur96tLwjwDd/xCm+9T91+cAxGLv8Pe0PjirjwnvktUtzpgOhedkYK7KX0l8SKxQXUK6Ul2/QbpGO3rmguzEdtrl3Dw1TAEfu2njXbNGVQ+JWV9htH+ymsMIGoeumJRaaAZ4AXLlQPBCxTXcdQDuAjfFDPuppms/h7qB1S4Aioz7zqyd7pL7Z6Z8mJBZZlP3PsfGvADM2CdShpbL4HAa+n9miNNSYcJ7cHvC/zCitNjfaEYLVYkB5G+ggeK8Ss/MDcnsh3YFB8WnT582zt/TTJda5n+5Q7tquc1m+61t2gEKKTfBoDft9UYW2/4ViHj3ROL2Oyj7udrh/oAqV8M= riku@MBP16inch2231
         state: present
         role: admin
-      - name: josh
-        ssh_keys:
-          - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDnx9Ths5yQ+Rn0Y+tsIFiO97aRlt93pHLbUstOSGeOKDXGyLUziNWlkBBShSlq1cx4S9nek52V4SVOQgROlyt2BWLw0oCsS6focBsf4WAD1heTjGSUsDCCxkviQCc/kPN0McO3e1IZyeMX6/0n6FF373bAvQYBZMcmA4tUKp5A2hRJldo/q8SIQf2ooehnHKhZJBZyv48BojqEwjRrdEEUhv7W3CQr9J0WDpf+PSe16KYk4HqH1DRKiXJtwgMzMxeXPx5qVBEuaL8KY/fD6GQV3CcBT4s0mdCWX+cSZKzX1rm34V6DW8Rd5fvVAXLyGmlXVXiOjpyNCOEB6ZuQL6bRARd5DmvjXWIwlf8EXzDAgqwsEbXBLRif9noFNMhb1OOOXIfnGjpjZzCVKMLynEqEF/cUpL4GCRxAJRwalcchhjtIyv88C5Vl4nDY0w55pdS/oaJx0KqCkqRQgyVYoEMe3fEDMXEUoAzFvsufUM3RMBu2YLV/8kLyvHxvRJuO7MbAScIUr1nG2N0tRCrgCNpoF/t15hkUhEnxTYZVyLfPni5XnwaKVqpbi5zQgXB/Ctd7i+9WiRa/qGhx7l+T0lz2X9rWoDIXky8cZ2xQYNfaMG3PKldjfawXwN32EOhWjlsoIzgPFLsK4QYqIMZcgpLTla1gBNJuxJUOuQe3vhMJDQ== MackBook-M3M
-        state: present
-        role: admin
   children:
     master:
       hosts:
